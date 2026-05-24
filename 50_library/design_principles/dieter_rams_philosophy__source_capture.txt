@@ -1,0 +1,126 @@
+﻿Chrome 확장(extension) 세션으로 다시 조사했습니다. 핵심은 “브라운 레트로 UI”가 아니라, **기능이 먼저 보이고 장식은 사라지는 인터랙티브 시스템**으로 번역하는 쪽이 맞습니다.
+
+**핵심 DNA**
+- Rams의 10원칙은 Vitsœ가 정리한 원문 기준으로 잡으면 됩니다: 혁신성, 유용성, 미감, 이해 가능성, 절제, 정직함, 지속성, 디테일, 환경성, “as little design as possible”. 출처: [Vitsœ Good Design](https://www.vitsoe.com/rw/about/good-design)
+- 제품 언어는 흰색/오프화이트/블랙/회색, 작은 원형 버튼, 명확한 그리드, 얇은 라벨, 제한된 포인트 컬러입니다. Design Museum은 Rams가 Braun에서 “elegant, legible, rigorous”한 산업 디자인 언어를 만들었다고 설명합니다. 출처: [Design Museum](https://designmuseum.org/designers/dieter-rams)
+- 대표 오브젝트는 `SK4 radio-phonograph`, `T3 pocket radio`, `TP1`, `606 Universal Shelving System`, `ET66 calculator`가 좋습니다. MoMA에도 Rams 작품 23점이 온라인에 있고, SK4/T3 같은 제품 정보를 확인했습니다. 출처: [MoMA Dieter Rams](https://www.moma.org/artists/8451-dieter-rams), [MoMA SK4](https://www.moma.org/collection/works/2649), [MoMA T3](https://www.moma.org/collection/works/4134)
+
+**웹 인터랙션으로 옮기기**
+- `606 모듈러 빌더`: 선반, 캐비닛, 데스크 모듈을 레일 위에 드래그하면 65cm/90cm bay에 스냅. 색상은 off-white, black, silver, beech 정도로 제한. 출처: [Vitsœ 606](https://www.vitsoe.com/rw/606)
+- `원칙별 제품 분해`: 10원칙을 누르면 같은 제품이 다르게 강조됨. 예: “understandable” 선택 시 버튼/다이얼 라벨만 드러남, “honest” 선택 시 과장된 효과가 제거됨.
+- `Braun control panel`: T3/ET66에서 온 버튼 그리드, 슬라이더, 다이얼을 실제 조작 가능하게 만들기. 인터랙션은 빠르고 조용하게, hover 과장 없이.
+- `Less but better meter`: 사용자가 요소를 추가할수록 “visual noise / usefulness / repairability” 같은 지표가 변함. 장식을 더하면 점수가 오르는 게 아니라 오히려 떨어지는 구조.
+- `SK4 transparent lid`: 제품을 카드처럼 보여주기보다 뚜껑이 열리고 내부 구조가 드러나는 미세한 물리 인터랙션으로 “이해 가능성”을 구현.
+
+**시각 방향**
+- 배경: 거의 흰색 또는 아주 연한 회색.
+- 타이포: Helvetica/Inter 계열, 작은 사이즈, 넓은 여백, 과한 굵기 금지.
+- 컬러: 회색 70%, 흰색/검정 25%, 포인트 컬러 5% 이하. 초록 on/off, 빨강 경고, 노랑 선택 정도.
+- 모션: spring보다 linear/ease-out 위주. “기계가 정확히 움직인다”는 느낌.
+- 컴포넌트: 카드 더미보다 패널, 레일, 슬롯, 라벨, 측정선, 모듈 조립감.
+
+**추가 조사 출처**
+- Chrome 확장으로 Vitsœ Good Design, Vitsœ 606, Design Museum, MoMA, W3C WCAG 2.2 Quick Reference, Nielsen Norman Group 10 Usability Heuristics, Google People + AI Guidebook, Microsoft HAX Toolkit, GOV.UK Writing for GOV.UK를 열어 확인했습니다.
+- Vitsœ 606은 “kit of parts”가 환경과 공간 변화에 맞춰 적응한다는 설명이 핵심입니다. 웹에서는 카드 나열보다 조립 가능한 부품 시스템으로 번역해야 합니다. 출처: [Vitsœ 606](https://www.vitsoe.com/rw/606)
+- 접근성은 WCAG 2.2의 perceivable, operable, understandable, robust 구조를 기준으로 잡고, keyboard, no keyboard trap, focus visible, target size, labels/instructions, error identification, status messages를 필수 체크로 둡니다. 출처: [W3C WCAG 2.2 Quick Reference](https://www.w3.org/WAI/WCAG22/quickref/)
+- 사용성은 NN/g의 visibility of system status, match between system and real world, user control and freedom, consistency, error prevention, recognition over recall, aesthetic and minimalist design을 Rams식 UI 평가에 직접 연결합니다. 출처: [NN/g 10 Usability Heuristics](https://www.nngroup.com/articles/ten-usability-heuristics/)
+- AI 관련 기준은 Google PAIR의 user needs, mental models, trust/explanations, feedback/controls, errors/graceful failures와 Microsoft HAX의 “무엇을 할 수 있는지”, “얼마나 잘 할 수 있는지”를 분명히 하라는 원칙을 반영합니다. 출처: [People + AI Guidebook](https://pair.withgoogle.com/guidebook/), [Microsoft HAX Toolkit](https://www.microsoft.com/en-us/haxtoolkit/library/)
+- 카피는 GOV.UK처럼 사용자 필요에서 출발하고, 짧은 문장, 쉬운 어휘, plain English/쉬운 한국어, 명확한 다음 행동을 기준으로 삼습니다. 출처: [Writing for GOV.UK](https://www.gov.uk/guidance/content-design/writing-for-gov-uk)
+
+**사용자 핵심 행위 정의**
+1. 관찰한다: 사용자는 Rams 원칙, 오브젝트, 모듈 상태를 한 화면에서 읽는다. 첫 3초 안에 “내가 조립하고 평가하는 도구”임을 알아야 한다.
+2. 조립한다: 사용자는 606식 레일/베이에 모듈을 드래그하고 스냅한다. 핵심 행위는 꾸미기가 아니라 구조를 만드는 것이다.
+3. 조정한다: 사용자는 다이얼, 스위치, 슬라이더로 크기, 밀도, 정렬, 대비, 라벨 노출 정도를 조절한다.
+4. 드러낸다: 사용자는 SK4 뚜껑처럼 레이어를 열어 내부 구조, 원칙 근거, 점수 이유를 확인한다.
+5. 줄인다: 사용자는 요소를 추가하는 만큼 제거도 해야 한다. “less but better”는 추가 기능이 아니라 삭제/정리 행위로 경험되어야 한다.
+6. 비교한다: 사용자는 변경 전/후, 원칙 on/off, AI 제안 전/후를 비교하고 자기 선택을 되돌릴 수 있어야 한다.
+7. 평가한다: 사용자는 결과물의 Rams score와 원칙별 근거를 보고 다음 수정 행동을 고른다.
+
+**원칙별 웹 UI 번역**
+| Rams 원칙 | 웹 UI 번역 | 구현 기준 |
+| --- | --- | --- |
+| Innovative | 새로움은 장식이 아니라 문제 해결 방식에서 나온다. | WebGL, drag, AI는 기능이 명확할 때만 쓴다. “멋져 보여서” 넣는 효과 금지. |
+| Useful | 첫 화면부터 사용자가 조립/비교/평가를 할 수 있어야 한다. | 랜딩 카피보다 작업 캔버스를 먼저 보여준다. |
+| Aesthetic | 미감은 비례, 정렬, 밀도, 여백에서 나온다. | 8px 계열 그리드, 제한 색, 얇은 라벨, 균일한 패널 폭. |
+| Understandable | 조작 결과가 즉시 이해되어야 한다. | 스냅 위치, 단위, 상태, 오류, 점수 변화 이유를 바로 보여준다. |
+| Unobtrusive | UI는 사용자의 구성물을 방해하지 않는다. | 패널은 필요할 때만 확장되고, hover 장식과 배지 과잉을 피한다. |
+| Honest | 시스템 능력과 한계를 숨기지 않는다. | AI 제안에는 근거, 확신도, 수정 가능성을 붙인다. 가짜 정밀 점수 금지. |
+| Long-lasting | 유행 UI보다 오래 버틸 구조를 우선한다. | glassmorphism, 과한 3D, 일회성 hero 연출보다 안정적인 레이아웃. |
+| Thorough | 사소한 상태까지 완결되어야 한다. | focus, disabled, loading, empty, error, mobile 상태를 모두 설계한다. |
+| Environmentally-friendly | 웹에서도 가벼움과 지속 가능성을 본다. | 이미지/3D 자산 최소화, lazy load, reduced motion, 불필요한 autoplay 금지. |
+| As little design as possible | 보이는 모든 것은 정보, 상태, 행동 중 하나를 맡아야 한다. | 장식 요소마다 “없애면 기능이 손상되는가?”를 통과해야 한다. |
+
+**AI 디자인 금지 목록**
+- “AI가 알아서 멋지게 만듭니다” 같은 마법형 문구 금지. 무엇을 입력으로 쓰고 무엇을 출력하는지 써야 한다.
+- 원본 Braun/Vitsœ 제품 이미지나 로고를 무단으로 복제한 것처럼 보이는 시각 금지. 출처 확인 전에는 추상화한 오브젝트만 쓴다.
+- 채팅창을 메인 화면으로 두고 실제 조립 행위를 밀어내는 구조 금지. AI는 조언 패널이지 제품의 중심 행위가 아니다.
+- 불확실한 추천을 단정형으로 제시 금지. “추정”, “근거”, “수정 가능”을 같이 보여준다.
+- 점수만 보여주고 이유를 숨기는 평가 금지. 점수는 항상 원칙별 근거와 다음 행동을 동반한다.
+- 추천을 5개 이상 쏟아내는 목록 금지. 한 번에 1-3개의 실행 가능한 수정만 제안한다.
+- AI가 사용자의 배치를 자동 덮어쓰기 금지. 적용 전 preview, undo, compare가 있어야 한다.
+- 어두운 유리 패널, 보라/파랑 그라디언트, 떠다니는 구체, 과한 bokeh, 의미 없는 particle 금지.
+- 사용성 검증 없는 작은 텍스트, 낮은 대비, 키보드 불가 drag-only 조작 금지.
+- 사람처럼 과도하게 말하는 AI 톤 금지. 정확하고 차분하게 도구처럼 말한다.
+
+**접근성/사용성 기준**
+- 키보드: 모든 drag/snap 행위는 키보드 대체 조작이 있어야 한다. 방향키 이동, Enter 선택, Escape 취소, Ctrl+Z 되돌리기를 제공한다.
+- 포커스: focus visible은 항상 보여야 하고, focus order는 화면의 읽기 순서와 같아야 한다. 모달/패널에서 keyboard trap을 만들지 않는다.
+- 대비: 본문 텍스트는 최소 4.5:1, 큰 텍스트와 비텍스트 UI는 최소 3:1을 목표로 한다.
+- 타깃 크기: 핵심 버튼과 핸들은 최소 24x24 CSS px, 터치 주 사용 영역은 44x44 px에 가깝게 잡는다.
+- 라벨: 아이콘 단독 버튼에도 accessible name과 tooltip을 둔다. 숫자 슬라이더에는 단위와 현재 값을 붙인다.
+- 상태: 저장, 스냅, 충돌, 비활성, 로딩, AI 분석 중, 점수 갱신 상태를 시각/텍스트로 함께 알린다.
+- 오류: “스냅할 공간이 없습니다”처럼 문제와 해결 행동을 같이 말한다. 빨간색만으로 오류를 전달하지 않는다.
+- 사용성: NN/g 기준으로 system status, real-world mapping, user control, consistency, error prevention, recognition over recall을 우선 검사한다.
+- 모션: 필수 피드백 모션은 150-250ms 안에 끝낸다. reduced motion 설정에서는 위치 변화만 남기고 장식 모션은 끈다.
+- 모바일: 우측 패널은 하단 sheet로 바뀌고, 캔버스 주요 조작은 엄지 영역 안에 들어와야 한다. 텍스트 겹침은 실패로 본다.
+
+**인터랙션별 존재 이유**
+- Drag: 사용자가 구조를 몸으로 이해하게 한다. 단순 장식 배치가 아니라 모듈과 레일의 관계를 배우는 행위다.
+- Snap: Rams식 정밀함을 경험시키는 핵심 피드백이다. 자유 배치보다 제한된 좋은 위치를 제안한다.
+- Rotate: 물건을 보는 시점을 바꿔 이해 가능성을 높인다. 3D 과시용 자동 회전은 피한다.
+- Switch: on/off의 즉각성을 보여준다. 원칙 토글, 라벨 표시, 전원 상태처럼 이분 상태에만 쓴다.
+- Dial: Braun control language를 직접 조작으로 번역한다. 연속값, 밀도, 밝기, 간격처럼 아날로그 감각이 있는 값에만 쓴다.
+- Reveal: SK4식 투명 뚜껑의 역할이다. 제품의 내부 구조, 평가 근거, AI 판단 근거를 숨겼다 보여준다.
+- Principle toggle: 같은 오브젝트를 다른 원칙으로 읽게 한다. 화면 전체 테마 변경이 아니라 관련 요소만 조용히 강조한다.
+- Less meter: 많이 넣을수록 좋아지는 게임을 막는다. 요소 수, 시각 소음, 유용성, 수리 가능성의 균형을 보여준다.
+- Compare: 사용자가 자기 판단을 갖게 한다. AI 제안은 “적용”보다 “비교 후 선택”이 먼저다.
+- Undo/Reset: 실험을 안전하게 만든다. 정직한 시스템은 되돌릴 권리를 항상 준다.
+
+**카피 톤 규칙**
+- 톤: 조용하고 정확하게. “대단한 경험”보다 “정렬됨”, “근거 있음”, “줄일 수 있음”처럼 상태와 행동을 말한다.
+- 문장: 한 문장에 하나의 정보만. 가능하면 20자 안팎의 짧은 한국어를 쓴다.
+- 버튼: 명사보다 동사. 예: `정렬`, `줄이기`, `비교`, `근거 보기`, `되돌리기`, `스냅 해제`.
+- 점수 문구: “82점”만 쓰지 말고 “82점. 라벨 대비와 모듈 간격은 좋지만, 장식 요소 2개가 목적을 설명하지 못합니다.”처럼 쓴다.
+- 오류 문구: “실패했습니다” 금지. “이 폭에는 캐비닛이 들어가지 않습니다. 90cm bay로 옮기거나 폭을 줄이세요.”
+- AI 문구: “제가 고쳤어요”보다 “제안 2개가 있습니다. 적용 전 비교할 수 있습니다.”
+- 금지어: 혁신적, 마법처럼, 몰입감 넘치는, 궁극의, 아름다운 경험, AI가 완성, 알아서 최적화.
+- 허용어: 유용함, 근거, 정렬, 간격, 대비, 라벨, 상태, 조정, 줄이기, 비교, 되돌리기.
+
+**평가 루브릭**
+| 항목 | 배점 | 통과 기준 |
+| --- | ---: | --- |
+| 핵심 행위 선명도 | 15 | 첫 화면에서 조립, 조정, 평가가 가능한 도구임을 바로 알 수 있다. |
+| Rams 원칙 번역 | 20 | 10원칙이 단순 텍스트가 아니라 UI 상태와 상호작용으로 드러난다. |
+| 시각 절제 | 15 | 장식 요소가 정보/상태/행동 중 하나를 맡고, 색/타입/모션이 제한되어 있다. |
+| 인터랙션 필연성 | 15 | drag, snap, dial, reveal 등 모든 인터랙션에 존재 이유가 있다. |
+| 접근성/사용성 | 15 | 키보드, 포커스, 대비, 라벨, 오류, 모바일 기준을 통과한다. |
+| AI 정직성 | 10 | AI 제안에는 근거, 한계, preview, undo가 있다. 과장된 단정이 없다. |
+| 성능/지속성 | 10 | 불필요한 자산과 모션을 줄이고, 오래 쓸 수 있는 컴포넌트 구조다. |
+
+**게이트 체크**
+- 한 화면 안에서 사용자의 다음 행동이 보이지 않으면 실패.
+- 장식 요소를 제거해도 기능이 그대로라면 그 장식은 삭제.
+- drag로 가능한 일은 키보드로도 가능해야 함.
+- 점수/AI 제안에는 반드시 이유와 되돌리기가 있어야 함.
+- 모바일에서 텍스트, 버튼, 패널, 캔버스가 겹치면 실패.
+- 원칙 토글이 화면 색만 바꾸면 실패. 실제 정보 강조 방식이 달라져야 함.
+- “less but better”가 단순 슬로건으로만 남으면 실패. 사용자가 실제로 줄이는 행동을 해야 함.
+
+**구현 MVP**
+1. 첫 화면: 606 스타일의 모듈러 그리드.
+2. 우측 패널: 10 principles 토글.
+3. 중앙: Braun/Vitsœ에서 영감 받은 추상 제품 오브젝트.
+4. 인터랙션: drag, snap, rotate, reveal, switch, dial.
+5. 결과: 사용자가 만든 구성을 “Rams score”로 평가.
+
+주의점은 실제 Braun/Vitsœ 제품 사진을 그대로 쓰기보다, 출처 확인 전에는 **추상화한 SVG/3D 오브젝트**로 재해석하는 편이 안전합니다. 다음 단계로는 이 조사 기반으로 바로 `React + Framer Motion` 또는 순수 `HTML/CSS/JS` 프로토타입 설계안을 잡으면 됩니다.

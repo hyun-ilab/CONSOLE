@@ -1,0 +1,31 @@
+# OS/editor noise
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.bak
+
+# Runtime/build artifacts
+node_modules/
+dist/
+build/
+.cache/
+.venv/
+.netlify/
+__pycache__/
+*.pyc
+
+# Local-only relationship context and dated conversation logs
+20_people/
+30_logs/
+
+# Local-only memory and private agent context
+MEMORY.md
+50_library/agent_prompts/user_cognitive_structure.md
+10_projects/console14/BEN_HANDOFF.md
+
+# Third-party source corpus / extracted full text.
+# Keep catalogs and indexes public, but do not redistribute bundled books.
+50_library/study/textbooks/10_sources/
+50_library/study/textbooks/15_source_text/
+50_library/study/textbooks/20_converted_md/
