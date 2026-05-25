@@ -108,12 +108,24 @@
   - TASK-NOTE: role = name the visible language move, such as softened request, clearer boundary, or warmer opener.
   - TASK-NOTE: links = generated from tone family map plus X/Y coordinate meanings.
   - TASK-NOTE: not = in-app instruction text that explains the whole prototype.
+- [ ] Brainstorm mobile one-handed UX ideas: explore UX concepts for natural one-handed control of the dial, XY grid, and readouts before changing the prototype.
+  - TASK-NOTE: aliases = UX brainstorm, mobile control ideas, thumb-zone concepts.
+  - TASK-NOTE: target = mobile interaction concept list for `prototype_resonance.html`.
+  - TASK-NOTE: role = generate candidate UX directions before implementation work on the one-handed mobile path.
+  - TASK-NOTE: links = informs mobile one-handed path, dial/grid ergonomics, readout stability, and usability test script.
+  - TASK-NOTE: not = immediate UI implementation or visual redesign.
 - [ ] Refine the mobile one-handed path: rework mobile interaction for stable thumb control of the dial, grid, and readouts.
   - TASK-NOTE: aliases = mobile thumb path, one-handed controls, narrow-screen interaction.
   - TASK-NOTE: target = mobile layout and touch behavior of dial, XY grid, and readouts in `prototype_resonance.html`.
   - TASK-NOTE: role = make the existing industrial console usable on a phone without changing the visual identity.
   - TASK-NOTE: links = must preserve tone dial, X/Y drag, readout stability, and text fit.
   - TASK-NOTE: not = desktop redesign; not replacing the dial/grid interaction model.
+- [ ] Verify the mobile research-instrument path and build Console15.
+  - TASK-NOTE: aliases = Console15 build gate, mobile research instrument, relationship-pressure path.
+  - TASK-NOTE: target = Console15 successor build after reviewing `prototype_resonance.html` and the six mobile prototypes.
+  - TASK-NOTE: role = verify that the flow supports custom sentence input, X/Y relationship-pressure control, tone-dial attitude control, before/current/softer/direct comparison, and high-pressure guard intervention before starting the next build.
+  - TASK-NOTE: links = `prototype_resonance.html`, `mobile_prototypes.html`, `prototype_mobile_04_grid_first.html`, `prototype_mobile_05_near_finger_feedback.html`, `prototype_mobile_06_pressure_guard.html`, audit scripts, and usability evidence.
+  - TASK-NOTE: not = immediate baseline promotion, generic mobile polish, landing-page design, or overwriting Console14 without an accepted gate.
 - [x] Create a reusable sentence-matrix audit: build an automated audit for all base tone/X/Y states and preset-expanded states.
   - TASK-NOTE: aliases = sentence matrix audit, 60x10x10 audit, combination checker.
   - TASK-NOTE: target = automated validation around the `prototype_resonance.html` sentence-generation matrix.
