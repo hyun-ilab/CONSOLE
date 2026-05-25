@@ -1,0 +1,1928 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Console Prototype 14 - Resonance Build</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600&family=IBM+Plex+Serif:wght@600&family=Inter:wght@600&family=Newsreader:opsz,wght@6..72,600&family=Space+Grotesk:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --base: #d4d2ca;
+        --base-hi: #eeeeE7;
+        --base-lo: #aaa89f;
+        --ink: #151612;
+        --graphite: #242520;
+        --muted: #676861;
+        --track: #9f9e95;
+        --olive: #68745a;
+        --accent: #b82f28;
+        --accent-soft: rgba(184, 47, 40, 0.2);
+        --display-bg: #0e0f0c;
+        --display-text: #e8e6dd;
+        --dial-angle: 72deg;
+        --grid-x-pos: 15%;
+        --grid-y-pos: 35%;
+        --grid-cell-x: 10%;
+        --grid-cell-y: 10%;
+        --tone-value: 20%;
+        --sentence-font: "IBM Plex Mono", monospace;
+        --sentence-weight: 600;
+        --sentence-tracking: 0.01em;
+        --display-font-size: clamp(22px, 2.3vw, 33px);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+        margin: 0;
+        background: #bdbcb5;
+        color: var(--ink);
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      body {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: clamp(12px, 2.4vw, 28px);
+      }
+
+      button {
+        font: inherit;
+      }
+
+      .plate-shell {
+        width: min(1200px, 100%);
+        min-height: min(760px, calc(100vh - 24px));
+        display: grid;
+        grid-template-rows: auto 1fr;
+        border: 1px solid rgba(0, 0, 0, 0.44);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.52), transparent 26%),
+          linear-gradient(135deg, var(--base-hi), var(--base) 58%, var(--base-lo));
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.68);
+      }
+
+      .mobile-sticky {
+        display: grid;
+        grid-template-rows: auto auto;
+      }
+
+      .topbar {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 22px;
+        min-height: 56px;
+        padding: 0 clamp(18px, 2.4vw, 30px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+      }
+
+      .brand,
+      .mono {
+        color: var(--muted);
+        font-family: "Courier New", monospace;
+        text-transform: uppercase;
+      }
+
+      .brand {
+        font-size: 10px;
+        letter-spacing: 0.12em;
+      }
+
+      .mono {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+      }
+
+      .top-readout {
+        display: grid;
+        grid-template-columns: repeat(3, max-content);
+        align-items: center;
+        justify-content: end;
+        gap: 18px;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .readout-item {
+        display: grid;
+        gap: 3px;
+        min-width: 0;
+      }
+
+      .readout-item b {
+        display: inline-block;
+        font-weight: inherit;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+
+      .readout-tone b {
+        min-width: 19ch;
+      }
+
+      .readout-x b,
+      .readout-y b {
+        min-width: 18ch;
+      }
+
+      .readout-item small {
+        color: var(--muted);
+        font-size: 8px;
+        letter-spacing: 0.08em;
+        line-height: 1;
+        opacity: 0.78;
+      }
+
+      .voice-control {
+        display: inline-grid;
+        grid-template-columns: auto 9px;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .listen {
+        min-height: 34px;
+        border: 1px solid rgba(0, 0, 0, 0.46);
+        border-radius: 2px;
+        background: #e9e8df;
+        color: var(--ink);
+        padding: 0 13px;
+        cursor: pointer;
+        font-family: "Courier New", monospace;
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 8px 16px rgba(0, 0, 0, 0.13);
+      }
+
+      .listen:active {
+        transform: translateY(1px);
+      }
+
+      .voice-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--graphite);
+        opacity: 0.28;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.26);
+        transition: opacity 50ms linear, background-color 50ms linear;
+      }
+
+      .voice-dot.is-speaking {
+        background: var(--accent);
+        opacity: 0.95;
+      }
+
+      .voice-dot.is-error {
+        background: #11120f;
+        opacity: 0.72;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .display-panel {
+        position: relative;
+        min-width: 0;
+        height: clamp(146px, 14.2vw, 190px);
+        margin: clamp(18px, 2.4vw, 30px);
+        margin-bottom: clamp(16px, 2.2vw, 26px);
+        padding: clamp(14px, 1.7vw, 20px);
+        border: 1px solid rgba(0, 0, 0, 0.62);
+        border-radius: 0;
+        background:
+          repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 4px),
+          linear-gradient(180deg, #2a2b27, #1c1d19);
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.4),
+          0 -1px 0 rgba(0, 0, 0, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.08),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.72),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+        overflow: hidden;
+      }
+
+      .mount-dot {
+        position: absolute;
+        z-index: 3;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: #080906;
+        box-shadow:
+          0 0 0 1px rgba(0, 0, 0, 0.58),
+          inset 0 1px 1px rgba(255, 255, 255, 0.12),
+          inset 0 -2px 2px rgba(0, 0, 0, 0.92);
+        pointer-events: none;
+      }
+
+      .mount-dot.nw {
+        left: 8px;
+        top: 8px;
+      }
+
+      .mount-dot.ne {
+        right: 8px;
+        top: 8px;
+      }
+
+      .mount-dot.sw {
+        left: 8px;
+        bottom: 8px;
+      }
+
+      .mount-dot.se {
+        right: 8px;
+        bottom: 8px;
+      }
+
+      .frame-label {
+        position: absolute;
+        right: clamp(20px, 2.2vw, 30px);
+        bottom: clamp(4px, 0.45vw, 7px);
+        z-index: 4;
+        padding: 2px 6px 1px;
+        background: rgba(0, 0, 0, 0.2);
+        color: rgba(232, 230, 221, 0.3);
+        font-family: "IBM Plex Mono", "Courier New", monospace;
+        font-size: clamp(8px, 0.72vw, 9px);
+        letter-spacing: 0.08em;
+        line-height: 1;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.08), 0 -1px 0 rgba(0, 0, 0, 0.5);
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .display-inner {
+        position: relative;
+        min-width: 0;
+        height: 100%;
+        display: grid;
+        grid-template-columns: max-content minmax(0, 1fr);
+        align-items: center;
+        column-gap: clamp(10px, 1.4vw, 16px);
+        padding: clamp(20px, 2.5vw, 30px) clamp(84px, 10vw, 140px) clamp(22px, 2.8vw, 34px) clamp(24px, 3vw, 40px);
+        border: 2px solid #080906;
+        background: linear-gradient(180deg, #0c0d0a 0%, #13140f 50%, #0c0d0a 100%);
+        box-shadow:
+          inset 0 0 0 1px rgba(0, 0, 0, 0.86),
+          inset 0 2px 3px rgba(255, 255, 255, 0.025),
+          inset 0 -2px 5px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+      }
+
+      .display-inner::before {
+        position: absolute;
+        inset: 0;
+        content: "";
+        pointer-events: none;
+        z-index: 1;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), transparent 40%);
+      }
+
+      .display-inner::after {
+        position: absolute;
+        inset: 0;
+        content: "";
+        pointer-events: none;
+        z-index: 1;
+        opacity: 0.04;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 80'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='80' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+        background-size: 160px 80px;
+        mix-blend-mode: screen;
+      }
+
+      .mount-label {
+        position: relative;
+        z-index: 2;
+        min-width: 0;
+        color: var(--display-text);
+        font-family: "Courier New", monospace;
+        font-size: clamp(9px, 0.85vw, 10px);
+        letter-spacing: 0.08em;
+        line-height: 1;
+        opacity: 0.35;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .display-sentence {
+        position: relative;
+        z-index: 2;
+        min-width: 0;
+        margin: 0;
+        color: transparent;
+        font-family: var(--sentence-font);
+        font-size: var(--display-font-size);
+        font-weight: var(--sentence-weight);
+        letter-spacing: var(--sentence-tracking);
+        line-height: 1.2;
+        background-image: repeating-linear-gradient(
+          to bottom,
+          var(--display-text) 0,
+          var(--display-text) 0.1em,
+          transparent 0.1em,
+          transparent 0.14em
+        );
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        white-space: nowrap;
+        text-align: left;
+      }
+
+      @supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+        .display-sentence {
+          color: var(--display-text);
+          background-image: none;
+          -webkit-text-fill-color: var(--display-text);
+        }
+      }
+
+      .display-id {
+        position: absolute;
+        right: clamp(18px, 2vw, 28px);
+        bottom: clamp(14px, 1.8vw, 22px);
+        z-index: 2;
+        color: rgba(232, 230, 221, 0.32);
+        font-family: "Courier New", monospace;
+        font-size: 10px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .body {
+        display: grid;
+        grid-template-columns: minmax(310px, 0.62fr) minmax(520px, 1.38fr);
+        gap: 1px;
+        background: rgba(0, 0, 0, 0.34);
+      }
+
+      .dial-bay,
+      .field-bay {
+        position: relative;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.45), transparent 30%),
+          var(--base);
+        overflow: hidden;
+      }
+
+      .dial-bay {
+        display: grid;
+        place-items: center;
+        padding: clamp(18px, 2.4vw, 30px);
+      }
+
+      .dial-stage {
+        display: grid;
+        place-items: center;
+      }
+
+      .dial-wrap {
+        position: relative;
+        width: min(342px, 76vw);
+        aspect-ratio: 1;
+        display: grid;
+        place-items: center;
+      }
+
+      .dial-wrap::before {
+        position: absolute;
+        inset: 0;
+        content: "";
+        border-radius: 50%;
+        background:
+          repeating-conic-gradient(rgba(0, 0, 0, 0.26) 0 0.6deg, transparent 0.6deg 30deg),
+          radial-gradient(circle, transparent 0 66%, rgba(0, 0, 0, 0.18) 67% 68%, transparent 69%);
+        -webkit-mask-image: radial-gradient(circle, transparent 0 69%, #000 70%);
+        mask-image: radial-gradient(circle, transparent 0 69%, #000 70%);
+      }
+
+      .dial-grid {
+        position: absolute;
+        inset: 2%;
+        z-index: 3;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .dial-grid::before {
+        position: absolute;
+        inset: 0;
+        content: "";
+        border: 1px solid var(--accent-soft);
+        border-radius: 50%;
+      }
+
+      .dial-grid .tick {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 1px;
+        height: 15px;
+        background: var(--accent);
+        opacity: 0.72;
+        transform-origin: 50% 0;
+      }
+
+      .dial-grid .tick.major {
+        width: 2px;
+        height: 23px;
+        opacity: 0.92;
+      }
+
+      .dial-grid .tick.decade {
+        height: 30px;
+      }
+
+      .dial {
+        position: relative;
+        z-index: 2;
+        width: 70%;
+        aspect-ratio: 1;
+        border: 1px solid rgba(0, 0, 0, 0.42);
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 38% 30%, rgba(255, 255, 255, 0.72), transparent 0 20%),
+          radial-gradient(circle, #dfded6 0 26%, #c7c5bd 27% 64%, #89877f 100%);
+        box-shadow:
+          inset 9px 12px 20px rgba(255, 255, 255, 0.48),
+          inset -14px -18px 26px rgba(0, 0, 0, 0.24),
+          0 20px 44px rgba(0, 0, 0, 0.24);
+        transform: rotate(var(--dial-angle));
+        cursor: grab;
+        touch-action: none;
+      }
+
+      .dial:active {
+        cursor: grabbing;
+      }
+
+      .dial:focus-visible,
+      .field:focus-visible,
+      .listen:focus-visible,
+      .scenario-button:focus-visible,
+      .custom-input:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 5px;
+      }
+
+      .dial::before {
+        position: absolute;
+        left: calc(50% - 2px);
+        top: 9%;
+        width: 4px;
+        height: 24%;
+        content: "";
+        background: var(--graphite);
+      }
+
+      .dial::after {
+        position: absolute;
+        inset: 42%;
+        content: "";
+        border-radius: 50%;
+        background: #11120f;
+        box-shadow: inset 0 0 0 5px #363730;
+      }
+
+      .field-bay {
+        min-height: 520px;
+        padding: clamp(22px, 3vw, 42px);
+      }
+
+      .field {
+        position: absolute;
+        inset: clamp(62px, 8vw, 92px) clamp(38px, 5vw, 64px) clamp(136px, 16vw, 168px) clamp(76px, 8vw, 104px);
+        border: 1px solid rgba(0, 0, 0, 0.36);
+        background:
+          radial-gradient(circle at var(--grid-x-pos) var(--grid-y-pos), transparent 0 39px, rgba(0, 0, 0, 0.28) 40px 41px, transparent 42px),
+          radial-gradient(circle at var(--grid-x-pos) var(--grid-y-pos), #151612 0 3px, transparent 4px),
+          linear-gradient(90deg, transparent calc(var(--grid-x-pos) - 0.5px), rgba(0, 0, 0, 0.48) calc(var(--grid-x-pos) - 0.5px) calc(var(--grid-x-pos) + 0.5px), transparent calc(var(--grid-x-pos) + 0.5px)),
+          linear-gradient(transparent calc(var(--grid-y-pos) - 0.5px), rgba(0, 0, 0, 0.48) calc(var(--grid-y-pos) - 0.5px) calc(var(--grid-y-pos) + 0.5px), transparent calc(var(--grid-y-pos) + 0.5px)),
+          repeating-linear-gradient(90deg, rgba(184, 47, 40, 0.28) 0 1px, transparent 1px var(--grid-cell-x)),
+          repeating-linear-gradient(rgba(184, 47, 40, 0.28) 0 1px, transparent 1px var(--grid-cell-y)),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 34%),
+          #efeee7;
+        cursor: grab;
+        touch-action: none;
+      }
+
+      .field-axis,
+      .field-current {
+        position: absolute;
+        z-index: 2;
+        color: rgba(21, 22, 18, 0.62);
+        font-family: "Courier New", monospace;
+        font-size: 9px;
+        letter-spacing: 0.08em;
+        line-height: 1;
+        pointer-events: none;
+        text-transform: uppercase;
+      }
+
+      .field-axis {
+        padding: 3px 5px 2px;
+        background: rgba(239, 238, 231, 0.76);
+        box-shadow: 0 0 0 1px rgba(21, 22, 18, 0.08);
+      }
+
+      .field-axis-x {
+        left: 10px;
+        top: 10px;
+      }
+
+      .field-axis-y {
+        left: 10px;
+        bottom: 10px;
+      }
+
+      .field-current {
+        right: 10px;
+        bottom: 10px;
+        max-width: calc(100% - 20px);
+        color: rgba(21, 22, 18, 0.7);
+        text-align: right;
+        white-space: nowrap;
+      }
+
+      .field.is-dragging {
+        cursor: grabbing;
+      }
+
+      .reticle {
+        position: absolute;
+        left: var(--grid-x-pos);
+        top: var(--grid-y-pos);
+        width: 21px;
+        height: 21px;
+        border: 1px solid rgba(0, 0, 0, 0.54);
+        border-radius: 50%;
+        background: #e5e4dc;
+        transform: translate(-50%, -50%);
+        box-shadow: inset 0 0 0 6px var(--graphite);
+        pointer-events: none;
+      }
+
+      .ticks-x,
+      .ticks-y {
+        position: absolute;
+        pointer-events: none;
+      }
+
+      .ticks-x {
+        left: clamp(76px, 8vw, 104px);
+        right: clamp(38px, 5vw, 64px);
+        top: clamp(54px, 7vw, 82px);
+        height: 26px;
+        background: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.36) 0 1px, transparent 1px var(--grid-cell-x));
+      }
+
+      .ticks-y {
+        left: clamp(48px, 6vw, 74px);
+        top: clamp(62px, 8vw, 92px);
+        bottom: clamp(136px, 16vw, 168px);
+        width: 26px;
+        background: repeating-linear-gradient(rgba(0, 0, 0, 0.36) 0 1px, transparent 1px var(--grid-cell-y));
+      }
+
+      .gauges {
+        position: absolute;
+        right: clamp(22px, 3vw, 40px);
+        bottom: clamp(22px, 3vw, 38px);
+        width: min(360px, calc(100% - 44px));
+        display: grid;
+        gap: 12px;
+      }
+
+      .gauge {
+        display: grid;
+        grid-template-columns: 88px 1fr;
+        gap: 12px;
+        align-items: center;
+        color: var(--muted);
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .slot {
+        position: relative;
+        height: 17px;
+        border-radius: 2px;
+        background:
+          repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), rgba(0, 0, 0, 0.14) calc(10% - 1px) 10%),
+          linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.26));
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(255, 255, 255, 0.55);
+      }
+
+      .slot::before {
+        position: absolute;
+        left: 8px;
+        right: 8px;
+        top: 8px;
+        height: 1px;
+        content: "";
+        background: var(--olive);
+        opacity: 0.72;
+      }
+
+      .cursor {
+        position: absolute;
+        top: 2px;
+        left: var(--value);
+        width: 8px;
+        height: 13px;
+        border-radius: 1px;
+        background: var(--graphite);
+        transform: translateX(-50%);
+      }
+
+      .reflection-panel {
+        display: grid;
+        gap: 10px;
+        min-width: 0;
+        padding: 0 clamp(18px, 2.4vw, 30px) clamp(16px, 2vw, 24px);
+      }
+
+      .reflection-controls {
+        display: grid;
+        grid-template-columns: minmax(340px, 0.92fr) minmax(280px, 1.08fr);
+        gap: 10px;
+        align-items: end;
+        min-width: 0;
+      }
+
+      .scenario-presets {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        min-width: 0;
+        border: 1px solid rgba(0, 0, 0, 0.32);
+        background: rgba(255, 255, 255, 0.18);
+      }
+
+      .scenario-button {
+        min-width: 0;
+        min-height: 34px;
+        border: 0;
+        border-right: 1px solid rgba(0, 0, 0, 0.2);
+        background: rgba(233, 232, 223, 0.62);
+        color: var(--muted);
+        cursor: pointer;
+        font-family: "Courier New", monospace;
+        font-size: 10px;
+        letter-spacing: 0.06em;
+        overflow: hidden;
+        padding: 0 7px;
+        text-overflow: clip;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .scenario-button:last-child {
+        border-right: 0;
+      }
+
+      .scenario-button.is-active {
+        background: var(--graphite);
+        color: #e9e8df;
+      }
+
+      .custom-input-wrap {
+        display: grid;
+        gap: 4px;
+        min-width: 0;
+        color: var(--muted);
+        font-family: "Courier New", monospace;
+        font-size: 9px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .custom-input {
+        width: 100%;
+        min-width: 0;
+        height: 34px;
+        border: 1px solid rgba(0, 0, 0, 0.34);
+        border-radius: 0;
+        background: rgba(233, 232, 223, 0.76);
+        color: var(--ink);
+        font-family: "Courier New", monospace;
+        font-size: 11px;
+        letter-spacing: 0.02em;
+        padding: 0 10px;
+      }
+
+      .custom-input::placeholder {
+        color: rgba(103, 104, 97, 0.68);
+      }
+
+      .reflection-readout,
+      .compare-strip {
+        display: grid;
+        min-width: 0;
+        border: 1px solid rgba(0, 0, 0, 0.28);
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      .reflection-readout {
+        grid-template-columns: 0.95fr 1.16fr 0.89fr;
+      }
+
+      .readout-cell,
+      .compare-cell {
+        min-width: 0;
+        border-right: 1px solid rgba(0, 0, 0, 0.18);
+        color: var(--muted);
+        font-family: "Courier New", monospace;
+      }
+
+      .readout-cell:last-child,
+      .compare-cell:last-child {
+        border-right: 0;
+      }
+
+      .readout-cell {
+        display: grid;
+        gap: 4px;
+        min-height: 42px;
+        padding: 7px 9px 6px;
+      }
+
+      .readout-cell span,
+      .compare-cell span {
+        font-size: 8px;
+        letter-spacing: 0.08em;
+        line-height: 1;
+        opacity: 0.75;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .readout-cell b {
+        display: block;
+        min-width: 0;
+        color: var(--ink);
+        font-size: 10px;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        line-height: 1.25;
+        overflow: hidden;
+        text-overflow: clip;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .compare-strip {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .compare-cell {
+        display: grid;
+        gap: 5px;
+        min-height: 56px;
+        padding: 7px 9px 8px;
+      }
+
+      .compare-cell p {
+        display: -webkit-box;
+        margin: 0;
+        min-width: 0;
+        color: var(--ink);
+        font-size: 10px;
+        letter-spacing: 0.01em;
+        line-height: 1.25;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
+
+      @media (max-width: 980px) {
+        body {
+          padding: 0;
+          place-items: stretch;
+        }
+
+        .plate-shell {
+          min-height: 100vh;
+          width: 100vw;
+          max-width: 100vw;
+          min-width: 0;
+        }
+
+        .mobile-sticky {
+          position: sticky;
+          top: 0;
+          z-index: 20;
+          background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.52), transparent 26%),
+            linear-gradient(135deg, var(--base-hi), var(--base) 58%, var(--base-lo));
+          box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+        }
+
+        .topbar {
+          grid-template-columns: minmax(0, 1fr) auto;
+          gap: 12px;
+          row-gap: 10px;
+          padding-top: 14px;
+          padding-bottom: 12px;
+        }
+
+        .top-readout {
+          grid-column: 1 / -1;
+          grid-row: 2;
+          min-width: 0;
+          max-width: 100%;
+          min-height: 2.35rem;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          align-items: start;
+          gap: 12px;
+          justify-content: start;
+          text-align: left;
+          font-size: 10px;
+        }
+
+        .readout-item {
+          min-height: 1.85rem;
+        }
+
+        .readout-item b {
+          min-width: 0;
+          width: 100%;
+          overflow: hidden;
+          text-overflow: clip;
+        }
+
+        .voice-control {
+          justify-self: end;
+        }
+
+        .listen {
+          min-height: 32px;
+          padding: 0 10px;
+        }
+
+        .display-panel {
+          margin: 14px;
+          min-width: 0;
+          height: clamp(148px, 24vw, 178px);
+          padding: 14px;
+        }
+
+        .display-inner {
+          padding: 24px clamp(74px, 14vw, 110px) 24px clamp(18px, 5vw, 30px);
+          column-gap: 10px;
+        }
+
+        .display-id {
+          right: clamp(14px, 3vw, 20px);
+          bottom: 10px;
+        }
+
+        .reflection-panel {
+          padding: 0 14px 14px;
+        }
+
+        .reflection-controls {
+          grid-template-columns: 1fr;
+        }
+
+        .reflection-readout {
+          grid-template-columns: 1fr;
+        }
+
+        .readout-cell {
+          min-height: 34px;
+        }
+
+        .readout-cell,
+        .compare-cell {
+          border-right: 0;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+        }
+
+        .readout-cell:last-child,
+        .compare-cell:last-child {
+          border-bottom: 0;
+        }
+
+        .compare-strip {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .compare-cell:nth-child(2) {
+          border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+        }
+
+        .body {
+          grid-template-columns: 1fr;
+          min-width: 0;
+        }
+
+        .dial-bay {
+          min-height: 360px;
+          min-width: 0;
+        }
+
+        .field-bay {
+          min-height: 560px;
+          min-width: 0;
+        }
+
+        .field-axis,
+        .field-current {
+          font-size: 8px;
+        }
+      }
+
+      @media (max-width: 540px) {
+        .top-readout {
+          min-height: 4.2rem;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px 10px;
+          font-size: 8.75px;
+          letter-spacing: 0.02em;
+        }
+
+        .readout-tone {
+          grid-column: 1 / -1;
+        }
+
+        .readout-item small {
+          letter-spacing: 0.04em;
+        }
+
+        .display-inner {
+          grid-template-columns: 1fr;
+          align-content: center;
+          row-gap: 7px;
+          padding: 24px 18px 36px 36px;
+        }
+
+        .display-sentence {
+          max-height: 3.6em;
+          overflow: hidden;
+          white-space: normal;
+        }
+
+        .display-id {
+          font-size: 9px;
+        }
+
+        .scenario-button {
+          min-height: 32px;
+          font-size: 8px;
+          letter-spacing: 0.02em;
+          padding: 0 3px;
+        }
+
+        .custom-input-wrap {
+          font-size: 8px;
+          letter-spacing: 0.04em;
+        }
+
+        .custom-input {
+          font-size: 10px;
+        }
+
+        .readout-cell b {
+          white-space: normal;
+        }
+
+        .compare-strip {
+          grid-template-columns: 1fr;
+        }
+
+        .compare-cell {
+          min-height: 48px;
+        }
+
+        .compare-cell:nth-child(2) {
+          border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+        }
+
+        .field-axis,
+        .field-current {
+          font-size: 7.5px;
+          letter-spacing: 0.04em;
+          line-height: 1.05;
+        }
+
+        .field-axis {
+          max-width: calc(100% - 20px);
+          padding: 3px 4px 2px;
+        }
+
+        .field-axis-y {
+          bottom: 31px;
+        }
+
+        .field-current {
+          right: 8px;
+          bottom: 8px;
+          max-width: calc(100% - 16px);
+          padding: 3px 4px 2px;
+          background: rgba(239, 238, 231, 0.82);
+          box-shadow: 0 0 0 1px rgba(21, 22, 18, 0.08);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="plate-shell" aria-label="Console prototype 14 striped LCD grid">
+      <div class="mobile-sticky">
+        <header class="topbar">
+          <div class="brand">console</div>
+          <div class="top-readout mono" aria-label="state readout">
+            <span class="readout-item readout-tone">
+              <b id="topTone">TONE 013 / 060 PLAIN</b>
+              <small>RESONANCE / DISTANCE</small>
+            </span>
+            <span class="readout-item readout-x">
+              <b id="topX">X 02 / 10 CASUAL</b>
+              <small>FORMALITY</small>
+            </span>
+            <span class="readout-item readout-y">
+              <b id="topY">Y 04 / 10 CLEAR</b>
+              <small>DIRECTNESS</small>
+            </span>
+          </div>
+          <div class="voice-control">
+            <button class="listen" id="speakButton" type="button" aria-label="Play sentence">LISTEN</button>
+            <span class="voice-dot" id="voiceDot" aria-hidden="true"></span>
+            <span class="sr-only" id="voiceStatus" aria-live="polite">Idle</span>
+          </div>
+        </header>
+
+        <section class="display-panel" aria-label="sentence display">
+          <span class="mount-dot nw" aria-hidden="true"></span>
+          <span class="mount-dot ne" aria-hidden="true"></span>
+          <span class="mount-dot sw" aria-hidden="true"></span>
+          <span class="mount-dot se" aria-hidden="true"></span>
+          <span class="frame-label" aria-hidden="true">MODEL 14 &middot; CONSOLE</span>
+          <div class="display-inner">
+            <span class="mount-label">OUTPUT</span>
+            <p class="display-sentence" id="sentence" aria-live="polite"></p>
+            <span class="display-id" id="displayId">SIG / T13 X2 Y4 / 6000</span>
+          </div>
+        </section>
+      </div>
+
+      <section class="reflection-panel" aria-label="language reflection controls">
+        <div class="reflection-controls">
+          <div class="scenario-presets" role="group" aria-label="Context preset">
+            <button class="scenario-button is-active" type="button" data-scenario="email">Email</button>
+            <button class="scenario-button" type="button" data-scenario="slack">Slack</button>
+            <button class="scenario-button" type="button" data-scenario="professor">Professor</button>
+            <button class="scenario-button" type="button" data-scenario="client">Client</button>
+            <button class="scenario-button" type="button" data-scenario="friend">Friend</button>
+          </div>
+          <label class="custom-input-wrap">
+            Custom sentence
+            <input
+              class="custom-input"
+              id="customInput"
+              type="text"
+              maxlength="120"
+              placeholder="Type a request, then use tone + X/Y"
+              autocomplete="off"
+            />
+          </label>
+        </div>
+        <div class="reflection-readout" aria-label="tone dimension readout">
+          <div class="readout-cell">
+            <span>Tone map</span>
+            <b id="toneDimension">Plain / balanced resonance</b>
+          </div>
+          <div class="readout-cell">
+            <span>Change</span>
+            <b id="deltaLabel">Neutral request with a clear timeline</b>
+          </div>
+          <div class="readout-cell">
+            <span>Boundary</span>
+            <b id="safetyLabel">Firm clarity; no guilt pressure</b>
+          </div>
+        </div>
+        <div class="compare-strip" aria-label="before and after comparison">
+          <div class="compare-cell">
+            <span>Original</span>
+            <p id="compareOriginal">Could you send me the revised draft?</p>
+          </div>
+          <div class="compare-cell">
+            <span>Current</span>
+            <p id="compareCurrent">Could you send me the revised draft by Friday if possible?</p>
+          </div>
+          <div class="compare-cell">
+            <span>Softer</span>
+            <p id="compareSofter">Could you send me the revised draft when you can?</p>
+          </div>
+          <div class="compare-cell">
+            <span>More direct</span>
+            <p id="compareDirect">Please send me the revised draft by Friday.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="body">
+        <aside class="dial-bay" aria-label="tone control">
+          <div class="dial-stage">
+            <div class="dial-wrap">
+              <div class="dial-grid" id="dialGrid" aria-hidden="true"></div>
+              <button
+                class="dial"
+                id="dial"
+                type="button"
+                role="slider"
+                aria-label="Tone family dial with 60 fixed steps"
+                aria-valuemin="1"
+                aria-valuemax="60"
+                aria-valuenow="13"
+              ></button>
+            </div>
+          </div>
+        </aside>
+
+        <section class="field-bay" aria-label="grid control">
+          <div class="ticks-x" aria-hidden="true"></div>
+          <div class="ticks-y" aria-hidden="true"></div>
+          <div
+            class="field"
+            id="field"
+            tabindex="0"
+            role="slider"
+            aria-label="Sentence grid position"
+            aria-valuetext="X 2 of 10, Y 4 of 10"
+          >
+            <div class="field-axis field-axis-x">X: FORMALITY / SOCIAL DISTANCE</div>
+            <div class="field-axis field-axis-y">Y: DIRECTNESS / PRESSURE</div>
+            <div class="field-current" id="fieldCurrent">X CASUAL / Y CLEAR</div>
+            <div class="reticle"></div>
+          </div>
+          <div class="gauges" aria-label="instrument gauges">
+            <div class="gauge">
+              <span>tone</span>
+              <div class="slot"><i class="cursor" style="--value: var(--tone-value)"></i></div>
+            </div>
+            <div class="gauge">
+              <span>formality</span>
+              <div class="slot"><i class="cursor" style="--value: var(--grid-x-pos)"></i></div>
+            </div>
+            <div class="gauge">
+              <span>directness</span>
+              <div class="slot"><i class="cursor" style="--value: var(--grid-y-pos)"></i></div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      const GRID_X_STEPS = 10;
+      const GRID_Y_STEPS = 10;
+      const MATRIX_TOTAL = 60 * GRID_X_STEPS * GRID_Y_STEPS;
+
+      const root = document.documentElement;
+      const dial = document.getElementById("dial");
+      const dialGrid = document.getElementById("dialGrid");
+      const field = document.getElementById("field");
+      const sentenceEl = document.getElementById("sentence");
+      const displayId = document.getElementById("displayId");
+      const speakButton = document.getElementById("speakButton");
+      const voiceDot = document.getElementById("voiceDot");
+      const voiceStatus = document.getElementById("voiceStatus");
+      const topTone = document.getElementById("topTone");
+      const topX = document.getElementById("topX");
+      const topY = document.getElementById("topY");
+      const fieldCurrent = document.getElementById("fieldCurrent");
+      const customInput = document.getElementById("customInput");
+      const scenarioButtons = Array.from(document.querySelectorAll(".scenario-button"));
+      const toneDimension = document.getElementById("toneDimension");
+      const deltaLabel = document.getElementById("deltaLabel");
+      const safetyLabel = document.getElementById("safetyLabel");
+      const compareOriginal = document.getElementById("compareOriginal");
+      const compareCurrent = document.getElementById("compareCurrent");
+      const compareSofter = document.getElementById("compareSofter");
+      const compareDirect = document.getElementById("compareDirect");
+
+      const formalityAxis = [
+        {
+          label: "CLOSE",
+          ask: "Can you {intent} {time}",
+          tell: "{imperative} {time}",
+          question: true
+        },
+        {
+          label: "CASUAL",
+          ask: "Could you {intent} {time}",
+          tell: "Please {intent} {time}",
+          question: true
+        },
+        {
+          label: "RELAXED",
+          ask: "Could you please {intent} {time}",
+          tell: "Please {intent} {time}",
+          question: true
+        },
+        {
+          label: "NEUTRAL",
+          ask: "Please {intent} {time}",
+          tell: "Please {intent} {time}",
+          question: false
+        },
+        {
+          label: "CLEAR",
+          ask: "Please {intent} {time}",
+          tell: "Please {intent} {time}",
+          question: false
+        },
+        {
+          label: "COURTEOUS",
+          ask: "Would you please {intent} {time}",
+          tell: "Please {intent} {time}",
+          question: true
+        },
+        {
+          label: "POLISHED",
+          ask: "Could you please {intent} {time}",
+          tell: "Please {intent} {time}",
+          question: true
+        },
+        {
+          label: "FORMAL",
+          ask: "Would you be able to {intent} {time}",
+          tell: "Please {intent} {time}",
+          question: true
+        },
+        {
+          label: "DISTANT",
+          ask: "Please arrange to {intent} {time}",
+          tell: "Please arrange to {intent} {time}",
+          question: false
+        },
+        {
+          label: "OFFICIAL",
+          ask: "Please ensure you {intent} {time}",
+          tell: "Please ensure you {intent} {time}",
+          question: false
+        }
+      ];
+
+      const directnessAxis = [
+        { label: "OPEN", time: "when you have a moment", force: 0 },
+        { label: "SOFT", time: "when you can", force: 1 },
+        { label: "EASY", time: "this week", force: 2 },
+        { label: "CLEAR", time: "by Friday if possible", force: 3 },
+        { label: "DIRECT", time: "by Friday", force: 4 },
+        { label: "PUSHED", time: "by Friday morning", force: 5 },
+        { label: "PRESSING", time: "before the review", force: 6 },
+        { label: "URGENT", time: "by noon Friday", force: 7 },
+        { label: "STRICT", time: "before Friday closes", force: 8 },
+        { label: "NO LATER", time: "by Friday, no later", force: 9 }
+      ];
+
+      const toneFamilies = [
+        {
+          name: "dry",
+          label: "DRY",
+          dimension: "CLINICAL DISTANCE",
+          resonance: 1,
+          clinical: 9,
+          pressure: 3,
+          rhythm: "short",
+          font: '"IBM Plex Mono", monospace',
+          weight: 600,
+          tracking: "0.01em",
+          rate: 0.84,
+          pitch: 0.82,
+          closers: [
+            "No context needed.",
+            "Keep it brief.",
+            "Use the latest version.",
+            "Draft only.",
+            "No cover note.",
+            "Plain copy is fine.",
+            "Attach the file.",
+            "Just the draft.",
+            "Send the file.",
+            "End there."
+          ]
+        },
+        {
+          name: "plain",
+          label: "PLAIN",
+          dimension: "BALANCED PLAIN",
+          resonance: 4,
+          clinical: 5,
+          pressure: 4,
+          rhythm: "even",
+          font: '"Inter", Arial, sans-serif',
+          weight: 600,
+          tracking: "0.01em",
+          rate: 0.9,
+          pitch: 0.9,
+          closers: [
+            "That works.",
+            "Please confirm.",
+            "A short note is enough.",
+            "The current version is fine.",
+            "No extra formatting needed.",
+            "Please include the file.",
+            "Use the shared version.",
+            "That should cover it.",
+            "That will be enough.",
+            "Thanks."
+          ]
+        },
+        {
+          name: "warm",
+          label: "WARM",
+          dimension: "EMOTIONAL RESONANCE",
+          resonance: 9,
+          clinical: 2,
+          pressure: 3,
+          rhythm: "soft",
+          font: '"Newsreader", Georgia, serif',
+          weight: 600,
+          tracking: "0.01em",
+          rate: 0.94,
+          pitch: 1,
+          closers: [
+            "I appreciate the help.",
+            "I appreciate it.",
+            "That would help me plan.",
+            "Thank you.",
+            "I would really appreciate it.",
+            "Thanks for making room for it.",
+            "That would mean a lot.",
+            "Thank you for prioritizing it.",
+            "I appreciate you handling it.",
+            "Thanks for taking care of it."
+          ]
+        },
+        {
+          name: "firm",
+          label: "FIRM",
+          dimension: "CLEAR PRESSURE",
+          resonance: 3,
+          clinical: 6,
+          pressure: 9,
+          rhythm: "compressed",
+          font: '"IBM Plex Sans Condensed", Arial Narrow, sans-serif',
+          weight: 600,
+          tracking: "0.01em",
+          rate: 0.88,
+          pitch: 0.86,
+          closers: [
+            "I need it for the next step.",
+            "Please prioritize it.",
+            "This needs to stay on track.",
+            "I am counting on that timing.",
+            "Please make this the priority.",
+            "I need it to move forward.",
+            "Please treat this as time-sensitive.",
+            "That is the deadline.",
+            "Please do not let this slip.",
+            "No later than that."
+          ]
+        },
+        {
+          name: "bright",
+          label: "BRIGHT",
+          dimension: "HIGH RESONANCE",
+          resonance: 8,
+          clinical: 2,
+          pressure: 5,
+          rhythm: "quick",
+          font: '"Space Grotesk", Arial, sans-serif',
+          weight: 600,
+          tracking: "0.01em",
+          rate: 0.98,
+          pitch: 1.06,
+          closers: [
+            "That would be great.",
+            "Thanks so much.",
+            "Perfect, thanks.",
+            "That would be a big help.",
+            "Really appreciate it.",
+            "Great if you can.",
+            "Thanks, that keeps us moving.",
+            "That would be excellent.",
+            "Appreciate the quick turn.",
+            "Thanks for jumping on it."
+          ]
+        },
+        {
+          name: "low",
+          label: "LOW",
+          dimension: "LOW-PRESSURE RESONANCE",
+          resonance: 7,
+          clinical: 3,
+          pressure: 1,
+          rhythm: "slow",
+          font: '"IBM Plex Serif", Georgia, serif',
+          weight: 600,
+          tracking: "0.01em",
+          rate: 0.8,
+          pitch: 0.76,
+          closers: [
+            "No rush beyond that.",
+            "Keep it simple.",
+            "That is enough.",
+            "Steady is fine.",
+            "No extra polish needed.",
+            "Just the draft is fine.",
+            "Please keep it focused.",
+            "I only need the essentials.",
+            "Keep the handoff quiet.",
+            "That closes the loop."
+          ]
+        }
+      ];
+
+      const scenarios = {
+        email: {
+          label: "EMAIL",
+          original: "Could you send me the revised draft?",
+          intent: "send me the revised draft"
+        },
+        slack: {
+          label: "SLACK",
+          original: "Can you drop the latest file in Slack?",
+          intent: "drop the latest file in Slack"
+        },
+        professor: {
+          label: "PROFESSOR",
+          original: "Could you review my abstract?",
+          intent: "review my abstract"
+        },
+        client: {
+          label: "CLIENT",
+          original: "Can you approve the scope note?",
+          intent: "approve the scope note"
+        },
+        friend: {
+          label: "FRIEND",
+          original: "Can you send me the photos?",
+          intent: "send me the photos"
+        }
+      };
+
+      let toneIndex = 12;
+      let gridXIndex = 1;
+      let gridYIndex = 3;
+      let activeScenario = "email";
+      let draggingDial = false;
+      let draggingField = false;
+      let fitFrame = 0;
+
+      function pad(value, width = 2) {
+        return String(Math.round(value)).padStart(width, "0");
+      }
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function clampIndex(value, steps) {
+        return clamp(Math.round(value), 0, steps - 1);
+      }
+
+      function cellCenter(index, steps) {
+        return ((index + 0.5) / steps) * 100;
+      }
+
+      function snapIndexFromPointer(clientValue, rectStart, rectSize, steps) {
+        const ratio = clamp((clientValue - rectStart) / rectSize, 0, 1);
+        return clampIndex(ratio * steps - 0.5, steps);
+      }
+
+      function toneFamily(index = toneIndex) {
+        return toneFamilies[Math.min(toneFamilies.length - 1, Math.floor(index / 10))];
+      }
+
+      function fillTemplate(template, values) {
+        return template
+          .replace(/\{intent\}/g, values.intent)
+          .replace(/\{imperative\}/g, values.imperative)
+          .replace(/\{time\}/g, values.time);
+      }
+
+      function finishSentence(text, question = false) {
+        const clean = text.replace(/\s+/g, " ").replace(/\s+([?.!])/g, "$1").trim();
+        return `${clean}${question ? "?" : "."}`;
+      }
+
+      function sanitizeSource(text) {
+        return text.replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, 120);
+      }
+
+      function normalizeIntent(text) {
+        let clean = sanitizeSource(text).replace(/[?.!]+$/g, "").trim();
+        clean = clean.replace(/^(can|could|would|will)\s+you\s+/i, "");
+        clean = clean.replace(/^please\s+/i, "");
+        clean = clean.replace(/^i\s+need\s+you\s+to\s+/i, "");
+        clean = clean.replace(/^we\s+need\s+to\s+/i, "");
+        clean = clean.replace(/^i\s+need\s+/i, "send me ");
+        clean = clean.replace(/\s+(when you have a moment|when you have time|when you can|tomorrow morning|tomorrow|today|this week|next week)$/i, "");
+        clean = clean.replace(/\s+(by|before)\s+(noon\s+)?(monday|tuesday|wednesday|thursday|friday|saturday|sunday)(\s+morning|\s+afternoon|\s+evening)?$/i, "");
+        if (!clean) return "handle this";
+        return clean.charAt(0).toLowerCase() + clean.slice(1);
+      }
+
+      function capitalizeIntent(intent) {
+        return intent.charAt(0).toUpperCase() + intent.slice(1);
+      }
+
+      function currentSource() {
+        const custom = sanitizeSource(customInput.value);
+        if (custom) {
+          return {
+            label: "CUSTOM",
+            original: custom,
+            intent: normalizeIntent(custom)
+          };
+        }
+        return scenarios[activeScenario];
+      }
+
+      function sentence(t, x, y, source = currentSource()) {
+        return transformSentence(t, x, y, source);
+      }
+
+      function transformSentence(t, x, y, source = currentSource()) {
+        const tone = toneFamily(t);
+        const step = t % 10;
+        const formality = formalityAxis[x];
+        const directness = directnessAxis[y];
+        const values = {
+          intent: source.intent,
+          imperative: capitalizeIntent(source.intent),
+          time: directness.time
+        };
+        const highPressure = directness.force >= 7;
+        const mediumPressure = directness.force >= 4;
+        const closer = tone.closers[step];
+        let line = "";
+
+        if (tone.name === "dry") {
+          line = finishSentence(fillTemplate(mediumPressure ? formality.tell : formality.ask, values), false);
+        } else if (tone.name === "warm") {
+          line = finishSentence(fillTemplate(highPressure ? formality.tell : formality.ask, values), !highPressure && formality.question);
+        } else if (tone.name === "firm") {
+          line = finishSentence(fillTemplate(formality.tell, values), false);
+        } else if (tone.name === "bright") {
+          line = finishSentence(fillTemplate(highPressure ? formality.tell : formality.ask, values), !highPressure && formality.question);
+        } else if (tone.name === "low") {
+          line = finishSentence(fillTemplate(highPressure ? formality.tell : formality.ask, values), false);
+        } else {
+          line = finishSentence(fillTemplate(highPressure ? formality.tell : formality.ask, values), !highPressure && formality.question);
+        }
+
+        return closer ? `${line} ${closer}` : line;
+      }
+
+      function comparisonVariants(t, x, y, source = currentSource()) {
+        return {
+          original: source.original,
+          current: transformSentence(t, x, y, source),
+          softer: transformSentence(t, x, clampIndex(y - 2, GRID_Y_STEPS), source),
+          direct: transformSentence(t, x, clampIndex(y + 2, GRID_Y_STEPS), source)
+        };
+      }
+
+      function toneDimensionLabel(tone) {
+        const resonance = tone.resonance >= 8 ? "HIGH RESONANCE" : tone.resonance <= 2 ? "LOW RESONANCE" : "MID RESONANCE";
+        const distance = tone.clinical >= 8 ? "CLINICAL" : tone.clinical <= 3 ? "RELATIONAL" : "BALANCED";
+        return `${tone.label} / ${tone.dimension} / ${resonance} / ${distance}`;
+      }
+
+      function explanationLabel(t, x, y) {
+        const tone = toneFamily(t);
+        const formality = formalityAxis[x];
+        const directness = directnessAxis[y];
+        const affect =
+          tone.clinical >= 8
+            ? "More clinical distance"
+            : tone.resonance >= 8
+              ? "More emotional resonance"
+              : tone.pressure >= 8
+                ? "Firmer pressure"
+                : "Balanced tone";
+        const distance = x >= 7 ? "more social distance" : x <= 2 ? "closer address" : "neutral distance";
+        const pressure = directness.force >= 7 ? "deadline pressure" : directness.force <= 2 ? "low pressure" : "clear timing";
+        return `${affect}; ${distance}; ${pressure}`;
+      }
+
+      function safetyBoundaryLabel(t, x, y) {
+        const tone = toneFamily(t);
+        const force = directnessAxis[y].force;
+        if (tone.resonance >= 8 && x <= 2) return "Warmth stays specific; no fake intimacy";
+        if (tone.clinical >= 8) return "Distance stays clear; not dismissive";
+        if (force >= 8 || tone.pressure >= 8) return "Firm clarity; no guilt pressure";
+        if (force <= 2) return "Soft request; no hidden urgency";
+        return "Clear ask; no coercive pressure";
+      }
+
+      function prosodyForState(t, x, y) {
+        const tone = toneFamily(t);
+        const force = directnessAxis[y].force;
+        return {
+          rate: clamp(tone.rate + (t % 10) * 0.006 + force * 0.004, 0.68, 1.18),
+          pitch: clamp(tone.pitch + (force - 4.5) * 0.025 + (tone.resonance - tone.clinical) * 0.01, 0.62, 1.22),
+          volume: 1
+        };
+      }
+
+      function speechTextForState(text, t) {
+        const tone = toneFamily(t);
+        if (tone.name === "low") return text.replace(/\. /g, ". ... ");
+        if (tone.name === "dry") return text.replace(/\? /g, ". ").replace(/, /g, ". ");
+        if (tone.name === "warm") return text.replace(/\. Thank/g, ". Thank");
+        return text;
+      }
+
+      function buildDialGrid() {
+        if (dialGrid.children.length) return;
+        for (let index = 0; index < 60; index += 1) {
+          const tick = document.createElement("i");
+          tick.className = `tick${index % 5 === 0 ? " major" : ""}${index % 10 === 0 ? " decade" : ""}`;
+          tick.dataset.index = String(index + 1);
+          dialGrid.appendChild(tick);
+        }
+        positionDialGrid();
+      }
+
+      function positionDialGrid() {
+        const radius = dialGrid.getBoundingClientRect().width / 2 - 8;
+        Array.from(dialGrid.children).forEach((tick, index) => {
+          tick.style.transform = `rotate(${index * 6}deg) translateY(${-radius}px)`;
+        });
+      }
+
+      function setVoiceState(state) {
+        voiceDot.classList.toggle("is-speaking", state === "speaking");
+        voiceDot.classList.toggle("is-error", state === "error");
+        voiceStatus.textContent = state === "speaking" ? "Playing" : state === "error" ? "Unavailable" : "Idle";
+      }
+
+      function fitDisplayText() {
+        const baseSize = window.innerWidth <= 540 ? "clamp(15px, 4.2vw, 22px)" : "clamp(22px, 2.4vw, 34px)";
+        root.style.setProperty("--display-font-size", baseSize);
+        if (fitFrame) {
+          cancelAnimationFrame(fitFrame);
+        }
+        fitFrame = requestAnimationFrame(() => {
+          fitFrame = 0;
+          const computed = Number.parseFloat(window.getComputedStyle(sentenceEl).fontSize);
+          let size = computed;
+          while (
+            (sentenceEl.scrollWidth > sentenceEl.clientWidth || sentenceEl.scrollHeight > sentenceEl.clientHeight + 1) &&
+            size > 8
+          ) {
+            size -= 1;
+            sentenceEl.style.fontSize = `${size}px`;
+          }
+          if (sentenceEl.scrollWidth <= sentenceEl.clientWidth && sentenceEl.scrollHeight <= sentenceEl.clientHeight + 1) {
+            return;
+          }
+          sentenceEl.style.fontSize = "8px";
+        });
+      }
+
+      function update() {
+        toneIndex = ((Math.round(toneIndex) % 60) + 60) % 60;
+        gridXIndex = clampIndex(gridXIndex, GRID_X_STEPS);
+        gridYIndex = clampIndex(gridYIndex, GRID_Y_STEPS);
+
+        const angle = toneIndex * 6;
+        const tone = toneFamily();
+        const tonePercent = (toneIndex / 59) * 100;
+        const gridXPercent = cellCenter(gridXIndex, GRID_X_STEPS);
+        const gridYPercent = cellCenter(gridYIndex, GRID_Y_STEPS);
+
+        root.style.setProperty("--dial-angle", `${angle}deg`);
+        root.style.setProperty("--grid-x-pos", `${gridXPercent}%`);
+        root.style.setProperty("--grid-y-pos", `${gridYPercent}%`);
+        root.style.setProperty("--grid-cell-x", `${100 / GRID_X_STEPS}%`);
+        root.style.setProperty("--grid-cell-y", `${100 / GRID_Y_STEPS}%`);
+        root.style.setProperty("--tone-value", `${tonePercent}%`);
+        root.style.setProperty("--sentence-font", tone.font);
+        root.style.setProperty("--sentence-weight", String(tone.weight));
+        root.style.setProperty("--sentence-tracking", tone.tracking);
+
+        const source = currentSource();
+        const currentSentence = sentence(toneIndex, gridXIndex, gridYIndex, source);
+        const variants = comparisonVariants(toneIndex, gridXIndex, gridYIndex, source);
+        const toneCount = toneIndex + 1;
+        const xCount = gridXIndex + 1;
+        const yCount = gridYIndex + 1;
+
+        sentenceEl.textContent = currentSentence;
+        sentenceEl.style.fontSize = "";
+        topTone.textContent = `TONE ${pad(toneCount, 3)} / 060 ${tone.label}`;
+        topX.textContent = `X ${pad(xCount)} / ${pad(GRID_X_STEPS)} ${formalityAxis[gridXIndex].label}`;
+        topY.textContent = `Y ${pad(yCount)} / ${pad(GRID_Y_STEPS)} ${directnessAxis[gridYIndex].label}`;
+        fieldCurrent.textContent = `X ${formalityAxis[gridXIndex].label} / Y ${directnessAxis[gridYIndex].label}`;
+        toneDimension.textContent = toneDimensionLabel(tone);
+        deltaLabel.textContent = explanationLabel(toneIndex, gridXIndex, gridYIndex);
+        safetyLabel.textContent = safetyBoundaryLabel(toneIndex, gridXIndex, gridYIndex);
+        compareOriginal.textContent = variants.original;
+        compareCurrent.textContent = variants.current;
+        compareSofter.textContent = variants.softer;
+        compareDirect.textContent = variants.direct;
+        displayId.textContent = `${source.label} / T${pad(toneCount, 2)} X${pad(xCount)} Y${pad(yCount)} / ${MATRIX_TOTAL}`;
+        dial.setAttribute("aria-valuenow", String(toneCount));
+        dial.setAttribute("aria-valuetext", `Tone ${toneCount} of 60, ${tone.label.toLowerCase()}, ${tone.dimension.toLowerCase()}`);
+        field.setAttribute(
+          "aria-valuetext",
+          `X ${xCount} of ${GRID_X_STEPS}, formality ${formalityAxis[gridXIndex].label.toLowerCase()}; Y ${yCount} of ${GRID_Y_STEPS}, directness ${directnessAxis[gridYIndex].label.toLowerCase()}`
+        );
+        fitDisplayText();
+      }
+
+      function setToneFromPointer(event) {
+        const rect = dial.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const raw = (Math.atan2(event.clientY - cy, event.clientX - cx) * 180) / Math.PI + 90;
+        const normalized = ((raw % 360) + 360) % 360;
+        toneIndex = Math.round(normalized / 6) % 60;
+        update();
+      }
+
+      function setGridFromPointer(event) {
+        const rect = field.getBoundingClientRect();
+        gridXIndex = snapIndexFromPointer(event.clientX, rect.left, rect.width, GRID_X_STEPS);
+        gridYIndex = snapIndexFromPointer(event.clientY, rect.top, rect.height, GRID_Y_STEPS);
+        update();
+      }
+
+      function speakSentence() {
+        if (!("speechSynthesis" in window)) {
+          setVoiceState("error");
+          return;
+        }
+        const voice = prosodyForState(toneIndex, gridXIndex, gridYIndex);
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(speechTextForState(sentenceEl.textContent, toneIndex));
+        utterance.lang = "en-US";
+        utterance.rate = voice.rate;
+        utterance.pitch = voice.pitch;
+        utterance.volume = voice.volume;
+        utterance.onstart = () => setVoiceState("speaking");
+        utterance.onend = () => setVoiceState("idle");
+        utterance.onerror = () => setVoiceState("error");
+        window.speechSynthesis.speak(utterance);
+      }
+
+      function auditSentences() {
+        const issues = [];
+        let total = 0;
+        Object.values(scenarios).forEach((source) => {
+          for (let x = 0; x < GRID_X_STEPS; x += 1) {
+            for (let y = 0; y < GRID_Y_STEPS; y += 1) {
+              let previous = "";
+              for (let t = 0; t < 60; t += 1) {
+                const text = transformSentence(t, x, y, source);
+                total += 1;
+                if (!text || /undefined|null|\{/.test(text)) issues.push(`${source.label} T${t + 1} X${x + 1} Y${y + 1}: malformed`);
+                if (/\s{2,}/.test(text) || /[?.!]{2,}/.test(text)) issues.push(`${source.label} T${t + 1} X${x + 1} Y${y + 1}: punctuation`);
+                if (text.length > 180) issues.push(`${source.label} T${t + 1} X${x + 1} Y${y + 1}: long text`);
+                if (previous === text) issues.push(`${source.label} T${t + 1} X${x + 1} Y${y + 1}: adjacent duplicate`);
+                previous = text;
+              }
+            }
+          }
+        });
+        return { total, issueCount: issues.length, issues: issues.slice(0, 40) };
+      }
+
+      dial.addEventListener("pointerdown", (event) => {
+        draggingDial = true;
+        dial.setPointerCapture(event.pointerId);
+        setToneFromPointer(event);
+      });
+
+      dial.addEventListener("pointermove", (event) => {
+        if (draggingDial) setToneFromPointer(event);
+      });
+
+      dial.addEventListener("pointerup", () => {
+        draggingDial = false;
+      });
+
+      dial.addEventListener("pointercancel", () => {
+        draggingDial = false;
+      });
+
+      dial.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+          event.preventDefault();
+          toneIndex += 1;
+          update();
+        }
+        if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+          event.preventDefault();
+          toneIndex -= 1;
+          update();
+        }
+      });
+
+      field.addEventListener("pointerdown", (event) => {
+        draggingField = true;
+        field.classList.add("is-dragging");
+        field.setPointerCapture(event.pointerId);
+        setGridFromPointer(event);
+      });
+
+      field.addEventListener("pointermove", (event) => {
+        if (draggingField) setGridFromPointer(event);
+      });
+
+      field.addEventListener("pointerup", () => {
+        draggingField = false;
+        field.classList.remove("is-dragging");
+      });
+
+      field.addEventListener("pointercancel", () => {
+        draggingField = false;
+        field.classList.remove("is-dragging");
+      });
+
+      field.addEventListener("keydown", (event) => {
+        const step = event.shiftKey ? 5 : 1;
+        if (event.key === "ArrowRight") {
+          event.preventDefault();
+          gridXIndex += step;
+          update();
+        }
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          gridXIndex -= step;
+          update();
+        }
+        if (event.key === "ArrowDown") {
+          event.preventDefault();
+          gridYIndex += step;
+          update();
+        }
+        if (event.key === "ArrowUp") {
+          event.preventDefault();
+          gridYIndex -= step;
+          update();
+        }
+      });
+
+      scenarioButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          activeScenario = button.dataset.scenario;
+          customInput.value = "";
+          scenarioButtons.forEach((item) => item.classList.toggle("is-active", item === button));
+          update();
+        });
+      });
+
+      customInput.addEventListener("input", update);
+      speakButton.addEventListener("click", speakSentence);
+      window.addEventListener("resize", () => {
+        positionDialGrid();
+        fitDisplayText();
+      });
+      if (document.fonts) {
+        document.fonts.ready.then(fitDisplayText);
+      }
+
+      window.console14 = {
+        auditSentences,
+        comparisonVariants,
+        prosodyForState,
+        scenarios,
+        transformSentence
+      };
+      buildDialGrid();
+      update();
+    </script>
+  </body>
+</html>

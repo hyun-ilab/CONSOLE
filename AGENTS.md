@@ -25,6 +25,7 @@
 - `Select-Object -First`, `rg` 결과, 파일명 목록은 탐색 증거일 뿐 전체 읽기 증거가 아니다.
 - 현재 할일을 찾을 때는 먼저 canonical command `rg --files -g TASKS.md 10_projects`만 실행한다. 필요할 때만 관련 `README.md`, `SPEC.md`, `30_logs/`, `50_library/`를 보조 근거로 연다.
 - Markdown task checkbox syntax는 활성 프로젝트의 `TASKS.md`에서만 사용한다. 참고용 점검표는 `CHECK:` 같은 일반 bullet로 쓴다.
+- 활성 프로젝트 `TASKS.md`의 체크박스 task 제목과 `TASK-NOTE:` 필드는 영어로 쓴다. 한국어는 사용자 원문이나 source wording을 짧게 인용해야 할 때만 둔다.
 - Codex가 새 실행 할일을 만들거나 추상/프로토타입 할일을 구체화할 때는 relational task notes를 붙인다: `aliases`, `target`, `role`, `links`, `not` 중 최소 3개를 짧게 남겨 사용자의 다음 짧은 표현이 어느 artifact/부품을 가리키는지 다시 붙잡을 수 있게 한다.
 - `TASK-NOTE:`는 task 아래 일반 bullet로 쓰고 checkbox를 늘리지 않는다. 안내파일에는 규칙 요약만 두고, 상세 연결관계는 해당 project `TASKS.md`나 `SPEC.md`에 둔다.
 - 새 정보는 역할별로 보낸다: Active Project 실행 할일은 `10_projects/<slug>/TASKS.md`, Previous Source/archive 맥락은 해당 source 폴더의 archive 문서나 `90_archive/`, People Context는 `20_people/`, 대화 기록은 `30_logs/`, 참고자료와 재사용 프롬프트는 `50_library/`.

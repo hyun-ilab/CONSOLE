@@ -1,0 +1,980 @@
+:root {
+  --base: #d4d2ca;
+  --base-hi: #eeeee7;
+  --base-lo: #aaa89f;
+  --ink: #151612;
+  --graphite: #242520;
+  --muted: #676861;
+  --track: #9f9e95;
+  --olive: #68745a;
+  --accent: #b82f28;
+  --accent-soft: rgba(184, 47, 40, 0.2);
+  --display-bg: #0e0f0c;
+  --display-text: #e8e6dd;
+  --dial-angle: 72deg;
+  --grid-x-pos: 15%;
+  --grid-y-pos: 35%;
+  --grid-cell-x: 10%;
+  --grid-cell-y: 10%;
+  --tone-value: 20%;
+  --sentence-font: "IBM Plex Mono", monospace;
+  --sentence-weight: 600;
+  --sentence-tracking: 0.01em;
+  --display-font-size: clamp(14px, 3.7vw, 20px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+  background: #bdbcb5;
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: clamp(10px, 2.6vw, 22px);
+}
+
+button {
+  font: inherit;
+}
+
+.prototype-shell {
+  width: min(430px, 100%);
+  min-height: min(884px, calc(100vh - 20px));
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  border: 1px solid rgba(0, 0, 0, 0.44);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.52), transparent 26%),
+    linear-gradient(135deg, var(--base-hi), var(--base) 58%, var(--base-lo));
+  box-shadow: 0 24px 76px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.68);
+  overflow: hidden;
+}
+
+.version-link {
+  position: fixed;
+  z-index: 40;
+  left: max(10px, env(safe-area-inset-left));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  min-height: 34px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.46);
+  border-radius: 2px;
+  background: #e9e8df;
+  color: var(--ink);
+  padding: 0 11px;
+  font-family: "Courier New", monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 8px 16px rgba(0, 0, 0, 0.13);
+}
+
+.version-link:active {
+  transform: translateY(1px);
+}
+
+.topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.brand,
+.mono {
+  color: var(--muted);
+  font-family: "Courier New", monospace;
+  text-transform: uppercase;
+}
+
+.brand {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.variant-id {
+  justify-self: end;
+  color: var(--muted);
+  font-family: "Courier New", monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.top-readout {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 10px;
+  min-width: 0;
+  color: var(--muted);
+  font-family: "Courier New", monospace;
+  font-size: 8.7px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.readout-item {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.readout-tone {
+  grid-column: 1 / -1;
+}
+
+.readout-item small {
+  color: var(--muted);
+  font-size: 7.5px;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  opacity: 0.78;
+}
+
+.readout-item b {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: inherit;
+}
+
+.listen,
+.pressure-arm,
+.step-button {
+  min-height: 34px;
+  border: 1px solid rgba(0, 0, 0, 0.46);
+  border-radius: 2px;
+  background: #e9e8df;
+  color: var(--ink);
+  padding: 0 12px;
+  cursor: pointer;
+  font-family: "Courier New", monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 8px 16px rgba(0, 0, 0, 0.13);
+}
+
+.listen:active,
+.pressure-arm:active,
+.step-button:active {
+  transform: translateY(1px);
+}
+
+.listen:focus-visible,
+.pressure-arm:focus-visible,
+.step-button:focus-visible,
+.dial:focus-visible,
+.field:focus-visible,
+.tone-rail:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.display-panel {
+  position: relative;
+  min-width: 0;
+  height: 156px;
+  margin: 14px;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.62);
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 4px),
+    linear-gradient(180deg, #2a2b27, #1c1d19);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4),
+    0 -1px 0 rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.72),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+  overflow: hidden;
+}
+
+.mount-dot {
+  position: absolute;
+  z-index: 3;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #080906;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.58),
+    inset 0 1px 1px rgba(255, 255, 255, 0.12),
+    inset 0 -2px 2px rgba(0, 0, 0, 0.92);
+  pointer-events: none;
+}
+
+.mount-dot.nw {
+  left: 8px;
+  top: 8px;
+}
+
+.mount-dot.ne {
+  right: 8px;
+  top: 8px;
+}
+
+.mount-dot.sw {
+  left: 8px;
+  bottom: 8px;
+}
+
+.mount-dot.se {
+  right: 8px;
+  bottom: 8px;
+}
+
+.display-inner {
+  position: relative;
+  min-width: 0;
+  height: 100%;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  column-gap: 10px;
+  padding: 24px 54px 26px 22px;
+  border: 2px solid #080906;
+  background: linear-gradient(180deg, #0c0d0a 0%, #13140f 50%, #0c0d0a 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.86),
+    inset 0 2px 3px rgba(255, 255, 255, 0.025),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.display-inner::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), transparent 40%);
+}
+
+.mount-label,
+.display-id {
+  position: relative;
+  z-index: 2;
+  color: rgba(232, 230, 221, 0.34);
+  font-family: "Courier New", monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.display-id {
+  position: absolute;
+  right: 18px;
+  bottom: 14px;
+}
+
+.display-sentence {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+  margin: 0;
+  color: transparent;
+  font-family: var(--sentence-font);
+  font-size: var(--display-font-size);
+  font-weight: var(--sentence-weight);
+  letter-spacing: var(--sentence-tracking);
+  line-height: 1.12;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--display-text) 0,
+    var(--display-text) 0.1em,
+    transparent 0.1em,
+    transparent 0.14em
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  overflow-wrap: normal;
+  white-space: normal;
+}
+
+@supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+  .display-sentence {
+    color: var(--display-text);
+    background-image: none;
+    -webkit-text-fill-color: var(--display-text);
+  }
+}
+
+.control-body {
+  position: relative;
+  min-height: 596px;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 1px;
+  background: rgba(0, 0, 0, 0.34);
+}
+
+.dial-bay,
+.field-bay,
+.assist-bay {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45), transparent 30%),
+    var(--base);
+  overflow: hidden;
+}
+
+.field-bay {
+  min-height: 344px;
+  padding: 42px 34px 92px 48px;
+}
+
+.field {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 248px;
+  border: 1px solid rgba(0, 0, 0, 0.36);
+  background:
+    radial-gradient(circle at var(--grid-x-pos) var(--grid-y-pos), transparent 0 39px, rgba(0, 0, 0, 0.28) 40px 41px, transparent 42px),
+    radial-gradient(circle at var(--grid-x-pos) var(--grid-y-pos), #151612 0 3px, transparent 4px),
+    linear-gradient(90deg, transparent calc(var(--grid-x-pos) - 0.5px), rgba(0, 0, 0, 0.48) calc(var(--grid-x-pos) - 0.5px) calc(var(--grid-x-pos) + 0.5px), transparent calc(var(--grid-x-pos) + 0.5px)),
+    linear-gradient(transparent calc(var(--grid-y-pos) - 0.5px), rgba(0, 0, 0, 0.48) calc(var(--grid-y-pos) - 0.5px) calc(var(--grid-y-pos) + 0.5px), transparent calc(var(--grid-y-pos) + 0.5px)),
+    repeating-linear-gradient(90deg, rgba(184, 47, 40, 0.28) 0 1px, transparent 1px var(--grid-cell-x)),
+    repeating-linear-gradient(rgba(184, 47, 40, 0.28) 0 1px, transparent 1px var(--grid-cell-y)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 34%),
+    #efeee7;
+  cursor: grab;
+  touch-action: none;
+}
+
+.field.is-dragging {
+  cursor: grabbing;
+}
+
+.field-axis,
+.field-current,
+.pressure-zone {
+  position: absolute;
+  z-index: 2;
+  color: rgba(21, 22, 18, 0.62);
+  font-family: "Courier New", monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  pointer-events: none;
+  text-transform: uppercase;
+}
+
+.field-axis {
+  padding: 3px 5px 2px;
+  background: rgba(239, 238, 231, 0.78);
+  box-shadow: 0 0 0 1px rgba(21, 22, 18, 0.08);
+}
+
+.field-axis-x {
+  left: 9px;
+  top: 9px;
+}
+
+.field-axis-y {
+  left: 9px;
+  bottom: 9px;
+}
+
+.field-current {
+  right: 9px;
+  bottom: 9px;
+  max-width: calc(100% - 18px);
+  color: rgba(21, 22, 18, 0.7);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.pressure-zone {
+  display: none;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 30%;
+  border-top: 1px solid rgba(184, 47, 40, 0.52);
+  background:
+    repeating-linear-gradient(-45deg, rgba(184, 47, 40, 0.12) 0 6px, transparent 6px 12px),
+    rgba(184, 47, 40, 0.06);
+}
+
+.reticle {
+  position: absolute;
+  left: var(--grid-x-pos);
+  top: var(--grid-y-pos);
+  width: 21px;
+  height: 21px;
+  border: 1px solid rgba(0, 0, 0, 0.54);
+  border-radius: 50%;
+  background: #e5e4dc;
+  transform: translate(-50%, -50%);
+  box-shadow: inset 0 0 0 6px var(--graphite);
+  pointer-events: none;
+}
+
+.ticks-x,
+.ticks-y {
+  position: absolute;
+  pointer-events: none;
+}
+
+.ticks-x {
+  left: 48px;
+  right: 34px;
+  top: 26px;
+  height: 18px;
+  background: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.36) 0 1px, transparent 1px var(--grid-cell-x));
+}
+
+.ticks-y {
+  left: 22px;
+  top: 42px;
+  bottom: 92px;
+  width: 18px;
+  background: repeating-linear-gradient(rgba(0, 0, 0, 0.36) 0 1px, transparent 1px var(--grid-cell-y));
+}
+
+.dial-bay {
+  min-height: 244px;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.dial-wrap {
+  position: relative;
+  width: min(235px, 60vw);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+
+.dial-wrap::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(rgba(0, 0, 0, 0.26) 0 0.6deg, transparent 0.6deg 30deg),
+    radial-gradient(circle, transparent 0 66%, rgba(0, 0, 0, 0.18) 67% 68%, transparent 69%);
+  -webkit-mask-image: radial-gradient(circle, transparent 0 69%, #000 70%);
+  mask-image: radial-gradient(circle, transparent 0 69%, #000 70%);
+}
+
+.dial-grid {
+  position: absolute;
+  inset: 2%;
+  z-index: 3;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.dial-grid::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  border: 1px solid var(--accent-soft);
+  border-radius: 50%;
+}
+
+.dial-grid .tick {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 12px;
+  background: var(--accent);
+  opacity: 0.72;
+  transform-origin: 50% 0;
+}
+
+.dial-grid .tick.major {
+  width: 2px;
+  height: 18px;
+  opacity: 0.92;
+}
+
+.dial-grid .tick.decade {
+  height: 24px;
+}
+
+.dial {
+  position: relative;
+  z-index: 2;
+  width: 70%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(0, 0, 0, 0.42);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 38% 30%, rgba(255, 255, 255, 0.72), transparent 0 20%),
+    radial-gradient(circle, #dfded6 0 26%, #c7c5bd 27% 64%, #89877f 100%);
+  box-shadow:
+    inset 9px 12px 20px rgba(255, 255, 255, 0.48),
+    inset -14px -18px 26px rgba(0, 0, 0, 0.24),
+    0 20px 44px rgba(0, 0, 0, 0.24);
+  transform: rotate(var(--dial-angle));
+  cursor: grab;
+  touch-action: none;
+}
+
+.dial:active {
+  cursor: grabbing;
+}
+
+.dial::before {
+  position: absolute;
+  left: calc(50% - 2px);
+  top: 9%;
+  width: 4px;
+  height: 24%;
+  content: "";
+  background: var(--graphite);
+}
+
+.dial::after {
+  position: absolute;
+  inset: 42%;
+  content: "";
+  border-radius: 50%;
+  background: #11120f;
+  box-shadow: inset 0 0 0 5px #363730;
+}
+
+.gauges {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.gauge {
+  display: grid;
+  grid-template-columns: 82px 1fr;
+  gap: 10px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.slot,
+.tone-rail {
+  position: relative;
+  height: 17px;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), rgba(0, 0, 0, 0.14) calc(10% - 1px) 10%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(255, 255, 255, 0.26));
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.slot::before,
+.tone-rail::before {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 8px;
+  height: 1px;
+  content: "";
+  background: var(--olive);
+  opacity: 0.72;
+}
+
+.cursor {
+  position: absolute;
+  top: 2px;
+  left: var(--value);
+  width: 8px;
+  height: 13px;
+  border-radius: 1px;
+  background: var(--graphite);
+  transform: translateX(-50%);
+}
+
+.tone-rail {
+  width: 100%;
+  height: 46px;
+  cursor: grab;
+  touch-action: none;
+}
+
+.tone-rail .cursor {
+  top: 9px;
+  width: 11px;
+  height: 28px;
+}
+
+.assist-bay {
+  min-height: 86px;
+  display: grid;
+  gap: 12px;
+  align-content: center;
+  padding: 16px 18px;
+}
+
+.step-bank {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.thumb-bubble {
+  position: absolute;
+  z-index: 12;
+  left: var(--grid-x-pos);
+  top: var(--grid-y-pos);
+  min-width: 102px;
+  padding: 8px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  background: rgba(21, 22, 18, 0.92);
+  color: var(--display-text);
+  font-family: "Courier New", monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  transform: translate(-50%, -142%);
+  pointer-events: none;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.24);
+  opacity: 0;
+}
+
+.is-interacting .thumb-bubble,
+.variant-near-feedback .thumb-bubble {
+  opacity: 1;
+}
+
+.pressure-arm[aria-pressed="true"] {
+  background: #2d3027;
+  color: var(--display-text);
+}
+
+.guard-status {
+  color: var(--muted);
+  font-family: "Courier New", monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.variant-thumb-zone .control-body {
+  grid-template-rows: 1fr 226px;
+}
+
+.variant-thumb-zone .field-bay {
+  min-height: 362px;
+  padding: 38px 28px 92px 42px;
+}
+
+.variant-thumb-zone .dial-bay {
+  justify-items: end;
+  padding-right: 28px;
+}
+
+.variant-thumb-zone .dial-wrap {
+  width: min(212px, 54vw);
+  transform: translateX(34px);
+}
+
+.variant-cradled .control-body {
+  grid-template-rows: 1fr 118px 190px;
+}
+
+.variant-cradled .assist-bay {
+  grid-row: 2;
+}
+
+.variant-cradled .dial-bay {
+  min-height: 190px;
+}
+
+.variant-cradled .dial-wrap {
+  width: 178px;
+}
+
+.variant-cradled .step-bank {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.variant-dial-first .control-body {
+  grid-template-rows: 246px 1fr;
+}
+
+.variant-dial-first .dial-bay {
+  grid-row: 2;
+  min-height: 350px;
+  align-items: end;
+  padding-bottom: 26px;
+}
+
+.variant-dial-first .dial-wrap {
+  width: min(318px, 80vw);
+}
+
+.variant-dial-first .field-bay {
+  grid-row: 1;
+  min-height: 246px;
+  padding: 34px 62px 64px 62px;
+}
+
+.variant-grid-first .control-body {
+  grid-template-rows: 1fr 120px;
+}
+
+.variant-grid-first .field-bay {
+  min-height: 476px;
+  padding: 38px 24px 88px 38px;
+}
+
+.variant-grid-first .dial-bay {
+  min-height: 120px;
+  padding: 22px 18px;
+}
+
+.variant-grid-first .dial-wrap {
+  display: none;
+}
+
+.variant-grid-first .tone-rail {
+  display: block;
+}
+
+.variant-near-feedback .control-body {
+  grid-template-rows: 1fr 214px;
+}
+
+.variant-near-feedback .field-bay {
+  min-height: 382px;
+  padding: 38px 34px 96px 48px;
+}
+
+.variant-near-feedback .dial-wrap {
+  width: min(196px, 54vw);
+}
+
+.variant-pressure-guard .pressure-zone {
+  display: block;
+}
+
+.variant-pressure-guard .control-body {
+  grid-template-rows: 1fr 112px;
+}
+
+.variant-pressure-guard .dial-bay {
+  min-height: 112px;
+  padding: 16px 18px;
+}
+
+.variant-pressure-guard .dial-wrap {
+  display: none;
+}
+
+.variant-pressure-guard .tone-rail {
+  display: block;
+}
+
+.variant-pressure-guard .assist-bay {
+  display: grid;
+}
+
+.tone-rail {
+  display: none;
+}
+
+@media (min-width: 880px) {
+  body {
+    padding: 24px;
+  }
+
+  .prototype-shell {
+    width: min(1180px, 100%);
+    min-height: min(760px, calc(100vh - 48px));
+    grid-template-rows: auto auto 1fr;
+  }
+
+  .topbar {
+    grid-template-columns: auto 1fr auto;
+    min-height: 56px;
+    padding: 0 28px;
+  }
+
+  .top-readout {
+    grid-column: auto;
+    grid-template-columns: repeat(3, max-content);
+    justify-content: end;
+    gap: 18px;
+    font-size: 11px;
+  }
+
+  .readout-tone {
+    grid-column: auto;
+  }
+
+  .display-panel {
+    height: clamp(146px, 14.2vw, 190px);
+    margin: 28px;
+    margin-bottom: 24px;
+    padding: 18px;
+  }
+
+  .display-inner {
+    padding: 30px 136px 32px 38px;
+  }
+
+  .display-sentence {
+    font-size: clamp(22px, 2.3vw, 33px);
+  }
+
+  .control-body {
+    min-height: 520px;
+    grid-template-columns: minmax(310px, 0.62fr) minmax(520px, 1.38fr);
+    grid-template-rows: 1fr;
+  }
+
+  .dial-bay {
+    min-height: 520px;
+  }
+
+  .field-bay {
+    min-height: 520px;
+    padding: clamp(62px, 8vw, 92px) clamp(38px, 5vw, 64px) clamp(136px, 16vw, 168px) clamp(76px, 8vw, 104px);
+  }
+
+  .field {
+    min-height: 0;
+  }
+
+  .ticks-x {
+    left: clamp(76px, 8vw, 104px);
+    right: clamp(38px, 5vw, 64px);
+    top: clamp(54px, 7vw, 82px);
+    height: 26px;
+  }
+
+  .ticks-y {
+    left: clamp(48px, 6vw, 74px);
+    top: clamp(62px, 8vw, 92px);
+    bottom: clamp(136px, 16vw, 168px);
+    width: 26px;
+  }
+
+  .dial-wrap {
+    width: min(342px, 76vw);
+  }
+
+  .variant-thumb-zone .control-body,
+  .variant-cradled .control-body,
+  .variant-dial-first .control-body,
+  .variant-grid-first .control-body,
+  .variant-near-feedback .control-body,
+  .variant-pressure-guard .control-body {
+    grid-template-columns: minmax(310px, 0.62fr) minmax(520px, 1.38fr);
+    grid-template-rows: 1fr;
+  }
+
+  .variant-thumb-zone .dial-bay,
+  .variant-cradled .dial-bay,
+  .variant-dial-first .dial-bay,
+  .variant-grid-first .dial-bay,
+  .variant-near-feedback .dial-bay,
+  .variant-pressure-guard .dial-bay {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 520px;
+  }
+
+  .variant-thumb-zone .field-bay,
+  .variant-cradled .field-bay,
+  .variant-dial-first .field-bay,
+  .variant-grid-first .field-bay,
+  .variant-near-feedback .field-bay,
+  .variant-pressure-guard .field-bay {
+    grid-column: 2;
+    grid-row: 1;
+    min-height: 520px;
+  }
+
+  .variant-grid-first .dial-wrap,
+  .variant-pressure-guard .dial-wrap {
+    display: grid;
+  }
+
+  .variant-grid-first .tone-rail,
+  .variant-pressure-guard .tone-rail {
+    display: none;
+  }
+
+  .variant-thumb-zone .dial-wrap {
+    width: min(342px, 76vw);
+    transform: none;
+  }
+
+  .variant-dial-first .dial-wrap {
+    width: min(390px, 84vw);
+  }
+
+  .variant-grid-first .field-bay {
+    padding: clamp(48px, 5vw, 68px) clamp(34px, 4vw, 48px) clamp(104px, 10vw, 132px) clamp(58px, 6vw, 82px);
+  }
+
+  .assist-bay {
+    display: none;
+  }
+}
+
+@media (max-width: 390px) {
+  body {
+    padding: 0;
+    place-items: stretch;
+  }
+
+  .prototype-shell {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+  }
+
+  .display-panel {
+    margin: 10px;
+    height: 148px;
+  }
+
+  .display-inner {
+    padding-right: 38px;
+  }
+
+  .field-bay {
+    padding-left: 38px;
+    padding-right: 22px;
+  }
+
+  .top-readout {
+    font-size: 8.2px;
+  }
+}

@@ -34,6 +34,45 @@ These labels are provisional. They should be visible enough for the prototype to
 
 The output should feel like a sentence transformed by tone and coordinate changes, not like unrelated fragments stitched together. Start from practical English request/response sentences and vary them across tone, X, and Y.
 
+## Resonance Build Route
+
+- Preserved baseline: `prototype.html`.
+- Working build copy: `prototype_resonance.html`.
+- Static-only route: local rule-based transforms; no backend, paid TTS API, model fine-tuning, or provider key.
+- Tone family map keeps six families and adds dimensions: emotional resonance, clinical distance, pressure handling, rhythm, and failure boundary.
+- Context presets: email, Slack, professor, client, and close friend.
+- Custom sentence mode normalizes a short request locally and applies the current tone/X/Y state.
+- Comparison strip: original, current, softer, and more direct.
+- Voice route: browser Web Speech only for this build; rate, pitch, and rhythm are derived from tone and pressure.
+
+## Build Governance
+
+- Do not edit `prototype.html` for resonance work unless the user explicitly accepts promotion.
+- Before any resonance edit, confirm the working target is `prototype_resonance.html`.
+- Before promotion, run `.\10_projects\console14\audit_resonance_build.ps1` from the workspace root.
+- Treat external TTS/provider research as a future-route note unless it changes the current static build.
+- Mark a task complete only when the implementation or reusable verification artifact exists, not from a one-off observation alone.
+
+## Verification Tiers
+
+- Script audit: baseline diff, copy presence, required UI/function hooks, and the 30,000-state sentence matrix.
+- Browser visual QA: desktop, mobile, detail zoom, interaction checks, and local console logs.
+- Speech QA: Web Speech API path can be verified by state and call path; audible prosody still needs human listening.
+- Promotion QA: browser evidence and script audit must both pass before replacing the preserved baseline.
+
+## Local Browser QA Route
+
+- Start local HTML checks through `tools/start_static_server.ps1`; open `http://127.0.0.1:<port>/...` in Browser instead of `file://`.
+- Mobile prototype variants should keep browser-critical assets local. Avoid external font/CDN links in throwaway UX prototypes unless the external dependency itself is being tested.
+- Browser automation should wait for DOM readiness, then inspect the target UI state. Do not make visual QA depend on full `load` completion when optional external assets could stall it.
+- For the six mobile one-handed prototype files, run `.\10_projects\console14\audit_mobile_prototypes.ps1` after structural edits.
+
+## Safety Boundary
+
+- Firmness may clarify timing, priority, and next action.
+- Resonance may add warmth and acknowledgement.
+- The build should avoid guilt pressure, fake intimacy, coercion, and cold dismissal.
+
 ## Product Language
 
-The UI and demo sentences stay in English. Korean can remain in planning documents, tasks, and internal notes.
+The UI, demo sentences, active task checkbox titles, and TASK-NOTE fields stay in English. Korean can remain in planning documents and internal notes, but not in the active TASKS.md task list unless quoting source wording is necessary.

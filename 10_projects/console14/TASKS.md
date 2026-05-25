@@ -2,7 +2,8 @@
 
 ## Setup
 
-- Current prototype: 14
+- Current prototype: `prototype.html` preserved baseline.
+- Current working build copy: `prototype_resonance.html`.
 - Source copied from Console13 on 2026-05-24: `../console13/prototype.html`
 - Goal: keep visual design mostly unchanged; rewrite sentence behavior and clarify tone/X/Y axes.
 
@@ -11,6 +12,13 @@
 - [x] Create `10_projects/console14/` from `console13`.
 - [x] Make `console14` the active project in root and project indexes.
 - [x] Update prototype surface labels from Prototype 13 to Prototype 14.
+- [x] Create preserved working copy `prototype_resonance.html` for the resonance build.
+- [x] Add reusable resonance build audit gate.
+  - TASK-NOTE: aliases = resonance audit, promotion gate, clone safety check.
+  - TASK-NOTE: target = `audit_resonance_build.ps1`.
+  - TASK-NOTE: role = verify preserved baseline, copied build hooks, governance docs, and sentence matrix before promotion.
+  - TASK-NOTE: links = `prototype.html`, `prototype_resonance.html`, SPEC build governance, browser QA.
+  - TASK-NOTE: not = a replacement for manual visual or audible QA.
 
 ## Next
 
@@ -26,107 +34,127 @@
 - [x] Separate narrow-mobile grid labels so axis text and current X/Y value do not overlap.
 - [x] Tune narrow-mobile readout text so longest X/Y labels fit without clipping.
 - [x] Give the narrow-mobile current grid value a small tag backing so the reticle cannot obscure it.
-- [x] Define the product stance: a relationship-pressure control tool (`관계 압력을 조절하는 도구`), not a generic sentence-polishing tool.
-- [ ] Tone family 지도 만들기: map the Console14 tone dial against explicit tone dimensions so users can see why each tone family behaves differently.
-  - TASK-NOTE: aliases = tone map, tone dimension table, dry/plain/warm 표, tone family map.
-  - TASK-NOTE: target = Console14 60-step tone dial in `prototype.html`.
+- [x] Define the product stance: a relationship-pressure control tool, not a generic sentence-polishing tool.
+- [x] Decide the tone family map: define the explicit tone dimensions behind the Console14 tone dial so users can see why each tone family behaves differently.
+  - TASK-NOTE: aliases = tone map, tone dimension table, dry/plain/warm table, tone family map.
+  - TASK-NOTE: target = Console14 60-step tone dial in `prototype_resonance.html`.
   - TASK-NOTE: role = source rule map for sentence generation and compact explanation UI.
   - TASK-NOTE: links = tone dial chooses family; X axis is formality/social distance; Y axis is directness/pressure.
   - TASK-NOTE: not = generic writing-style taxonomy; not a replacement for X/Y axes.
-  - TASK-NOTE: dimensions = vocabulary, sentence length, indirectness, pressure-handling, friendliness, rhythm, failure modes.
-- [ ] External tone feedback 반영: add an `emotional resonance <-> clinical distance` dimension to the tone-family map and sample outputs.
+  - TASK-NOTE: dimensions = vocabulary, sentence length, indirectness, pressure-handling, friendliness, rhythm, emotional resonance, clinical distance, failure modes.
+- [x] Reflect the external tone axis: turn reviewer feedback about `emotional resonance <-> clinical distance` into a visible tone-family dimension and sample-output contrast.
   - TASK-NOTE: aliases = external tone axis, resonant vs clinical, monotone/cold/clinical contrast.
-  - TASK-NOTE: target = Console14 tone map, sentence samples, TTS/readout behavior in `prototype.html`.
+  - TASK-NOTE: target = Console14 tone map, sentence samples, TTS/readout behavior in `prototype_resonance.html`.
   - TASK-NOTE: role = turn external 2026-05-25 feedback into a testable tone contrast.
   - TASK-NOTE: links = tone family map, before/after comparison, explanation layer, user-input mode, tone safety rules.
   - TASK-NOTE: not = a separate reviewer-specific feature or visual redesign.
-- [ ] Reflection loop spec 작성: define the prototype loop where users immediately read and hear how intention, affect, distance, and pressure changed.
+- [x] Decide the reflection loop: decide how users immediately read and hear what changed in intention, affect, distance, and pressure.
   - TASK-NOTE: aliases = reflection device, read/hear loop, intention-affect-distance-pressure feedback.
-  - TASK-NOTE: target = Console14 interaction spec and the LCD + speech feedback flow in `prototype.html`.
+  - TASK-NOTE: target = Console14 interaction spec and the LCD + speech feedback flow in `prototype_resonance.html`.
   - TASK-NOTE: role = keep Console from becoming a generic tone changer by making the reflected delta explicit.
   - TASK-NOTE: links = user-input mode, before/after comparison, explanation layer, TTS prosody map.
   - TASK-NOTE: not = a long tutorial or onboarding text.
-- [ ] Transformation engine route 정리: compare rule-based, LLM/BERT, and embedding/vector routes for the first small text-transformation engine.
+- [x] Decide the text transformation engine route: choose the first buildable route among rule-based transforms, LLM/BERT zero-shot, and embedding/vector experiments.
   - TASK-NOTE: aliases = technical reviewer engine route, vectorize/embed route, LLM/BERT transform plan, semantic coordinate engine.
-  - TASK-NOTE: target = Console14 technical planning note and later `prototype.html` sentence-generation backend/fallback.
+  - TASK-NOTE: target = Console14 technical planning note and later `prototype_resonance.html` sentence-generation backend/fallback.
   - TASK-NOTE: role = connect semantic/tone control feedback to a buildable first engine.
   - TASK-NOTE: links = user-input mode, reusable sentence sets, 6,000-combination audit, English tone style guide.
   - TASK-NOTE: not = immediate model fine-tuning or production AI integration.
-- [ ] TTS prosody map 만들기: map tone states to rate, pitch, pause, punctuation, and rhythm so resonant vs clinical differences are audible.
+- [x] Decide the voice/TTS route: decide whether the next voice layer uses ElevenLabs, Hugging Face TTS, browser Web Speech fallback, or a staged combination.
+  - TASK-NOTE: aliases = ElevenLabs route, Hugging Face TTS route, Web Speech fallback, voice route, speech route.
+  - TASK-NOTE: target = Console14 speech feedback path in `prototype_resonance.html` and any future Netlify/serverless boundary.
+  - TASK-NOTE: role = turn voice-layer feedback into an implementation choice before prosody work.
+  - TASK-NOTE: links = TTS prosody map, reflection loop, user-input mode, before/after comparison, tone safety rules.
+  - TASK-NOTE: not = final paid provider contract, final voice clone rollout, or broad audio product research.
+- [x] Decide the TTS prosody model: decide how tone states change rate, pitch, pause, punctuation, and rhythm so resonant vs clinical differences are audible.
   - TASK-NOTE: aliases = sound tone map, prosody map, TTS rate/pitch/pause rhythm, audible resonance.
-  - TASK-NOTE: target = speech synthesis behavior in `prototype.html`.
+  - TASK-NOTE: target = speech synthesis behavior in `prototype_resonance.html`.
   - TASK-NOTE: role = make sound prove the tone change instead of merely reading the sentence aloud.
-  - TASK-NOTE: links = external tone axis, reflection loop spec, before/after comparison, tone safety rules.
-  - TASK-NOTE: not = choosing a final paid TTS provider.
-- [ ] Reusable sentence sets 만들기: draft reusable sentence sets for email, Slack, professor, client, and close friend contexts.
+  - TASK-NOTE: links = voice/TTS route decision, external tone axis, reflection loop spec, before/after comparison, tone safety rules.
+  - TASK-NOTE: not = choosing a final paid TTS provider by itself.
+- [x] Create reusable sentence sets: draft reusable sentence sets for email, Slack, professor, client, and close friend contexts.
   - TASK-NOTE: aliases = context sentence bank, reusable examples, email/Slack/professor/client/friend sets.
-  - TASK-NOTE: target = source sentence materials for `prototype.html` sentence generation.
+  - TASK-NOTE: target = source sentence materials for `prototype_resonance.html` sentence generation.
   - TASK-NOTE: role = provide stable base situations for comparing tone, X, and Y changes.
   - TASK-NOTE: links = feeds context presets, before/after samples, user-input fallback examples, and 6,000-combination audit.
   - TASK-NOTE: not = generic English phrasebook; not final UI copy by itself.
-- [ ] Context presets 추가: add presets such as email, Slack, professor, client, and close friend.
+- [x] Add context presets: add presets such as email, Slack, professor, client, and close friend.
   - TASK-NOTE: aliases = scenario presets, relationship context switch, email/Slack/professor/client/friend modes.
-  - TASK-NOTE: target = compact preset control near the sentence/input area in `prototype.html`.
+  - TASK-NOTE: target = compact preset control near the sentence/input area in `prototype_resonance.html`.
   - TASK-NOTE: role = choose the relationship setting before tone and X/Y transform the sentence.
   - TASK-NOTE: links = uses reusable sentence sets; should stay legible with tone dial, X axis, and Y axis.
   - TASK-NOTE: not = a new app navigation layer; not a replacement for tone/X/Y controls.
-- [ ] User-input mode 추가: add a mode that transforms a custom sentence through the current tone and X/Y settings.
+- [x] Decide and add the user-input mode scope: decide the safe first scope for transforming a custom sentence through the current tone and X/Y settings.
   - TASK-NOTE: aliases = custom sentence mode, input transform, bring-your-own sentence.
-  - TASK-NOTE: target = `prototype.html` input/output flow, likely near the LCD sentence readout.
+  - TASK-NOTE: target = `prototype_resonance.html` input/output flow, likely near the LCD sentence readout.
   - TASK-NOTE: role = let users test their own sentence against the current tone family and X/Y coordinates.
-  - TASK-NOTE: links = depends on tone family map, context presets, before/after comparison, and explanation layer.
+  - TASK-NOTE: links = depends on transformation engine route, tone family map, context presets, before/after comparison, and explanation layer.
   - TASK-NOTE: not = full backend LLM integration unless explicitly added later.
-- [ ] Before/after sample sets 만들기: draft samples for original, current, softer, and more direct variants.
+- [x] Create before/after sample sets: draft samples for original, current, softer, and more direct variants.
   - TASK-NOTE: aliases = transformation examples, original/current/softer/direct set, comparison samples.
   - TASK-NOTE: target = sample data for comparison mode and usability testing.
   - TASK-NOTE: role = show how the same intention changes when pressure or softness changes.
   - TASK-NOTE: links = uses reusable sentence sets; validates X/Y meanings and tone-family consistency.
   - TASK-NOTE: not = exhaustive audit of every dial/grid state.
-- [ ] Before/after comparison mode 추가: add a comparison mode for original, current, softer, and more direct variants.
+- [x] Add before/after comparison mode: add a comparison mode for original, current, softer, and more direct variants.
   - TASK-NOTE: aliases = compare mode, transformation panel, original/current/soft/direct view.
-  - TASK-NOTE: target = `prototype.html` display layer around the current sentence readout.
+  - TASK-NOTE: target = `prototype_resonance.html` display layer around the current sentence readout.
   - TASK-NOTE: role = help users see the delta between their starting sentence and nearby relationship-pressure options.
   - TASK-NOTE: links = uses before/after sample sets, user-input mode, and compact explanation layer.
   - TASK-NOTE: not = a large document editor or multi-message conversation view.
-- [ ] Explanation layer 추가: add a compact explanation layer that names what changed in the transformed sentence.
+- [x] Decide and add explanation-layer wording rules: decide the compact labels that name what changed in the transformed sentence, then add them to the prototype.
   - TASK-NOTE: aliases = what changed label, delta explanation, change rationale.
-  - TASK-NOTE: target = small readout/label area in `prototype.html`, not a full tutorial panel.
+  - TASK-NOTE: target = small readout/label area in `prototype_resonance.html`, not a full tutorial panel.
   - TASK-NOTE: role = name the visible language move, such as softened request, clearer boundary, or warmer opener.
   - TASK-NOTE: links = generated from tone family map plus X/Y coordinate meanings.
   - TASK-NOTE: not = in-app instruction text that explains the whole prototype.
-- [ ] Mobile one-handed path 정리: rework mobile interaction for stable thumb control of the dial, grid, and readouts.
+- [ ] Refine the mobile one-handed path: rework mobile interaction for stable thumb control of the dial, grid, and readouts.
   - TASK-NOTE: aliases = mobile thumb path, one-handed controls, narrow-screen interaction.
-  - TASK-NOTE: target = mobile layout and touch behavior of dial, XY grid, and readouts in `prototype.html`.
+  - TASK-NOTE: target = mobile layout and touch behavior of dial, XY grid, and readouts in `prototype_resonance.html`.
   - TASK-NOTE: role = make the existing industrial console usable on a phone without changing the visual identity.
   - TASK-NOTE: links = must preserve tone dial, X/Y drag, readout stability, and text fit.
   - TASK-NOTE: not = desktop redesign; not replacing the dial/grid interaction model.
-- [ ] 6,000-combination audit 만들기: build an automated audit for all 6,000 tone/X/Y sentence combinations.
+- [x] Create a reusable sentence-matrix audit: build an automated audit for all base tone/X/Y states and preset-expanded states.
   - TASK-NOTE: aliases = sentence matrix audit, 60x10x10 audit, combination checker.
-  - TASK-NOTE: target = automated validation around the `prototype.html` sentence-generation matrix.
+  - TASK-NOTE: target = automated validation around the `prototype_resonance.html` sentence-generation matrix.
   - TASK-NOTE: role = catch duplicate adjacent states, text overflow risk, malformed sentences, and tone/X/Y drift.
   - TASK-NOTE: links = validates reusable sentence sets, tone family map, context presets, and explanation labels.
   - TASK-NOTE: not = manual visual QA replacement; browser layout checks still matter.
-- [ ] English tone style guide 작성: write a Console14 English tone style guide that documents sentence-generation rules.
+  - TASK-NOTE: evidence = `audit_resonance_build.ps1` checks 30,000 states because five context presets multiply the 6,000 base matrix.
+- [x] Write the English tone style guide: write a Console14 English tone style guide that documents sentence-generation rules.
   - TASK-NOTE: aliases = tone writing guide, sentence rulebook, English style spec.
   - TASK-NOTE: target = project documentation, likely `10_projects/console14/SPEC.md` or a scoped project note if it grows.
   - TASK-NOTE: role = preserve the rules for tone family, X/Y behavior, context presets, and safety boundaries.
   - TASK-NOTE: links = should summarize tone family map, sentence sets, before/after logic, and safety rules.
   - TASK-NOTE: not = full linguistic research paper or long historical log.
-- [ ] Usability test script 준비: prepare a short usability test script and observation sheet for five quick testers.
+- [ ] Prepare a usability test script: prepare a short usability test script and observation sheet for five quick testers.
   - TASK-NOTE: aliases = five-tester script, observation sheet, quick usability test.
   - TASK-NOTE: target = local project note under `10_projects/console14/` or `30_logs/` after testing.
   - TASK-NOTE: role = check whether users understand tone dial, X/Y axes, presets, comparison, and explanation labels.
   - TASK-NOTE: links = should test the prototype after tone map and key interaction additions are in place.
   - TASK-NOTE: not = formal IRB-style study or broad product survey.
-- [ ] Tone safety rules 정의: define safety rules that separate clarity and firmness from manipulation or excessive pressure.
+- [ ] Capture durable browser QA evidence before promotion.
+  - TASK-NOTE: aliases = durable browser evidence, non-temp screenshots, promotion QA record.
+  - TASK-NOTE: target = browser QA notes and any screenshots for `prototype_resonance.html`.
+  - TASK-NOTE: role = separate visual proof from temporary screenshots and one-off observations.
+  - TASK-NOTE: links = desktop QA, mobile 390/360 checks, detail zoom, local console logs, audit gate.
+  - TASK-NOTE: not = changing the prototype UI or overwriting the preserved baseline.
+- [x] Define the tone safety boundary: define rules that separate clarity and firmness from manipulation, guilt pressure, fake intimacy, or excessive pressure.
   - TASK-NOTE: aliases = pressure safety, firm-not-manipulative rules, ethical tone boundaries.
   - TASK-NOTE: target = sentence-generation constraints and explanation/safety documentation.
   - TASK-NOTE: role = keep relationship-pressure control from becoming coercive, guilt-inducing, or deceptive.
   - TASK-NOTE: links = constrains tone family map, Y-axis pressure behavior, before/after variants, and user-input mode.
   - TASK-NOTE: not = generic AI safety policy; this is Console14-specific language behavior.
-- [ ] Next additions 우선순위 정하기: choose the top three prototype additions to implement first after the language rules are clearer.
+- [x] Prioritize the next additions: choose the top three prototype additions to implement first after the language rules are clearer.
   - TASK-NOTE: aliases = top three additions, next implementation order, prototype priority list.
   - TASK-NOTE: target = Console14 planning after tone map, sentence sets, and safety rules clarify the language engine.
   - TASK-NOTE: role = select the smallest next build sequence that improves user understanding fastest.
   - TASK-NOTE: links = should compare context presets, user-input mode, comparison mode, explanation layer, mobile path, and audit.
   - TASK-NOTE: not = adding every idea at once or changing the industrial visual design by default.
+- [ ] Decide whether to promote `prototype_resonance.html` over the preserved `prototype.html`.
+  - TASK-NOTE: aliases = promote resonance build, replace baseline, choose active prototype.
+  - TASK-NOTE: target = `prototype_resonance.html` and `prototype.html`.
+  - TASK-NOTE: role = preserve the original until the copied build is accepted.
+  - TASK-NOTE: links = resonance build browser QA, `audit_resonance_build.ps1`, original Console14 baseline.
+  - TASK-NOTE: not = automatic overwrite of the preserved baseline.
+  - TASK-NOTE: gate = Run the resonance build audit gate before promotion.
