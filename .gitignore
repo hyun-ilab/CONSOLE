@@ -21,6 +21,8 @@ __pycache__/
 
 # Local-only memory and private agent context
 MEMORY.md
+CLAUDE.local.md
+.claude/settings.local.json
 50_library/agent_prompts/user_cognitive_structure.md
 10_projects/console14/BEN_HANDOFF.md
 

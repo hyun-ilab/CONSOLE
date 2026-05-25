@@ -51,6 +51,7 @@
 
 ## Current Hubs
 
+- Public agent handoff: [START_HERE.md](START_HERE.md). Use this when opening the repo with Codex or Claude Code from GitHub.
 - Active Project: [Console14](10_projects/console14/README.md). Current tasks are discovered with `rg --files -g TASKS.md 10_projects`.
 - Previous Source: [Console13](10_projects/console13/README.md). Archive only; copied from Console13 on 2026-05-24 into Console14.
 - Local-only context: `20_people/` and `30_logs/` are intentionally ignored for public GitHub sharing.
