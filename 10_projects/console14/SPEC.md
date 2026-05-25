@@ -36,4 +36,4 @@ The output should feel like a sentence transformed by tone and coordinate change
 
 ## Product Language
 
-The UI and demo sentences stay in English. Korean can remain in planning documents, tasks, and internal notes.
+The UI, demo sentences, active task checkbox titles, and TASK-NOTE fields stay in English. Korean can remain in planning documents and internal notes, but not in the active TASKS.md task list unless quoting source wording is necessary.
