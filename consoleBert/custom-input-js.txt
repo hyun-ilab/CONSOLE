@@ -1,0 +1,113 @@
+      // Add these elements at the top of the script section
+      const customInput = document.getElementById("customInput");
+      const transformButton = document.getElementById("transformButton");
+      const speakCustomButton = document.getElementById("speakCustomButton");
+      const customOutput = document.getElementById("customOutput");
+
+      function getToneName(index) {
+        const families = ["dry", "plain", "warm", "firm", "bright", "low"];
+        return families[Math.floor(index / 10)];
+      }
+
+      async function transformCustomText() {
+        const text = customInput.value.trim();
+        if (!text) {
+          customOutput.textContent = "(empty input)";
+          return;
+        }
+
+        transformButton.disabled = true;
+        customOutput.textContent = "Transforming...";
+
+        try {
+          const tone = getToneName(toneIndex);
+          const res = await fetch("http://localhost:8000/transform", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text, tone, x: gridXIndex, y: gridYIndex })
+          });
+
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            customOutput.textContent = `Error: ${err.detail || res.statusText}`;
+            return;
+          }
+
+          const result = await res.json();
+          customOutput.textContent = result.text || text;
+        } catch (e) {
+          customOutput.textContent = `Network error: ${e.message}`;
+        } finally {
+          transformButton.disabled = false;
+        }
+      }
+
+      // Try ElevenLabs TTS (tone-aware), fall back to Web Speech API.
+      async function speakCustom() {
+        const textToSpeak = customOutput.textContent || customInput.value.trim();
+        if (!textToSpeak || textToSpeak.startsWith("(") || textToSpeak.startsWith("Error")) return;
+
+        const toneName = getToneName(toneIndex);
+        speakCustomButton.disabled = true;
+        setVoiceState("speaking");
+
+        try {
+          const res = await fetch("http://localhost:8000/tts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: textToSpeak, tone: toneName })
+          });
+
+          if (res.ok) {
+            const blob = await res.blob();
+            const audioUrl = URL.createObjectURL(blob);
+            const audio = new Audio(audioUrl);
+            audio.onended = () => {
+              URL.revokeObjectURL(audioUrl);
+              setVoiceState("idle");
+              speakCustomButton.disabled = false;
+            };
+            audio.onerror = () => {
+              URL.revokeObjectURL(audioUrl);
+              speakWithWebSpeech(textToSpeak, toneName);
+            };
+            audio.play();
+            return;
+          }
+          // 501 = API key not set; fall through to Web Speech
+          if (res.status !== 501) {
+            console.warn("ElevenLabs TTS failed:", res.status);
+          }
+        } catch (e) {
+          console.warn("ElevenLabs TTS unavailable, using Web Speech:", e.message);
+        }
+
+        speakWithWebSpeech(textToSpeak, toneName);
+      }
+
+      function speakWithWebSpeech(text, toneName) {
+        if (!("speechSynthesis" in window)) {
+          setVoiceState("error");
+          speakCustomButton.disabled = false;
+          return;
+        }
+        const tone = toneFamily();
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "en-US";
+        utterance.rate = tone.rate + (toneIndex % 10) * 0.006;
+        utterance.pitch = tone.pitch + (gridYIndex - (GRID_Y_STEPS - 1) / 2) * 0.04;
+        utterance.onstart = () => setVoiceState("speaking");
+        utterance.onend = () => {
+          setVoiceState("idle");
+          speakCustomButton.disabled = false;
+        };
+        utterance.onerror = () => {
+          setVoiceState("error");
+          speakCustomButton.disabled = false;
+        };
+        window.speechSynthesis.speak(utterance);
+      }
+
+      transformButton.addEventListener("click", transformCustomText);
+      speakCustomButton.addEventListener("click", speakCustom);

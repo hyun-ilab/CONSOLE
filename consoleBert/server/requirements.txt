@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+requests
+transformers
+torch
+sentencepiece
+python-dotenv
+anthropic

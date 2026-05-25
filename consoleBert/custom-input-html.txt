@@ -1,0 +1,14 @@
+      <section class="custom-input-panel" aria-label="custom text transform">
+        <label class="custom-input-label">Enter your own text</label>
+        <textarea
+          class="custom-input-field"
+          id="customInput"
+          placeholder="Type your message here and click TRANSFORM or SPEAK to apply the current tone."
+          aria-label="Custom text input"
+        ></textarea>
+        <div class="custom-buttons">
+          <button class="custom-button" id="transformButton" type="button" aria-label="Transform text using BERT">TRANSFORM</button>
+          <button class="custom-button" id="speakCustomButton" type="button" aria-label="Speak the custom text">SPEAK</button>
+        </div>
+        <div class="custom-output" id="customOutput" aria-live="polite" aria-label="Transformed output"></div>
+      </section>

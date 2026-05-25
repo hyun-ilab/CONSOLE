@@ -1,0 +1,8 @@
+[
+  {"tone":"plain","x":1,"y":3,"text":"Please send me the draft by Friday."},
+  {"tone":"warm","x":1,"y":2,"text":"Could you please send the draft when you have a moment? Thanks!"},
+  {"tone":"firm","x":8,"y":8,"text":"Please prioritize sending the draft by Friday morning."},
+  {"tone":"dry","x":4,"y":5,"text":"Send the draft."},
+  {"tone":"bright","x":2,"y":1,"text":"That would be great — please send the draft this week!"},
+  {"tone":"low","x":0,"y":0,"text":"No rush, but when you can, please send the draft."}
+]
