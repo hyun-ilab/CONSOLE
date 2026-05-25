@@ -61,6 +61,31 @@ button {
   overflow: hidden;
 }
 
+.version-link {
+  position: fixed;
+  z-index: 40;
+  left: max(10px, env(safe-area-inset-left));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  min-height: 34px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.46);
+  border-radius: 2px;
+  background: #e9e8df;
+  color: var(--ink);
+  padding: 0 11px;
+  font-family: "Courier New", monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 8px 16px rgba(0, 0, 0, 0.13);
+}
+
+.version-link:active {
+  transform: translateY(1px);
+}
+
 .topbar {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

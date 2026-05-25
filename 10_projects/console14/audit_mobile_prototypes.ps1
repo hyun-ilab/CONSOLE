@@ -6,6 +6,7 @@ $resolvedRoot = (Resolve-Path -LiteralPath $Root).Path
 $files = Get-ChildItem -LiteralPath $resolvedRoot -Filter "prototype_mobile_*.html" -File | Sort-Object Name
 $sharedCss = Join-Path $resolvedRoot "mobile_onehanded_shared.css"
 $sharedJs = Join-Path $resolvedRoot "mobile_onehanded_shared.js"
+$selector = Join-Path $resolvedRoot "mobile_prototypes.html"
 $spec = Join-Path $resolvedRoot "SPEC.md"
 $failures = @()
 
@@ -21,6 +22,10 @@ if ($files.Count -ne 6) {
     $failures += "Expected 6 prototype_mobile_*.html files, found $($files.Count)"
 }
 
+if (-not (Test-Path -LiteralPath $selector -PathType Leaf)) {
+    $failures += "Missing mobile_prototypes.html selector"
+}
+
 foreach ($file in $files) {
     $text = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8
     $relative = $file.FullName.Substring($resolvedRoot.Length).TrimStart("\", "/")
@@ -31,7 +36,8 @@ foreach ($file in $files) {
         "CONSOLE_MOBILE_PROTOTYPE",
         "id=""sentence""",
         "id=""field""",
-        "id=""toneRail"""
+        "id=""toneRail""",
+        "mobile_prototypes.html"
     )) {
         if ($text -notlike "*$needle*") {
             $failures += "$relative missing $needle"
@@ -40,6 +46,15 @@ foreach ($file in $files) {
 
     if ($text -match "file://|fonts\.googleapis|fonts\.gstatic|https?://") {
         $failures += "$relative contains a blocked or external browser dependency"
+    }
+}
+
+if (Test-Path -LiteralPath $selector -PathType Leaf) {
+    $selectorText = Get-Content -LiteralPath $selector -Raw -Encoding UTF8
+    foreach ($file in $files) {
+        if ($selectorText -notlike "*$($file.Name)*") {
+            $failures += "mobile_prototypes.html missing link to $($file.Name)"
+        }
     }
 }
 
