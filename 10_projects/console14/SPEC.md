@@ -10,6 +10,10 @@
 
 Keep the tactile Console13 interface, but make the language controls legible. The user should understand that the dial changes tone family, while the X/Y field changes two sentence qualities and keeps live numeric readouts.
 
+## Product Stance
+
+Console14 is a relationship-pressure control tool (`관계 압력을 조절하는 도구`), not a tool for making English sound generically polished or stylish.
+
 ## Prototype 14 Scope
 
 - Preserve the main industrial console design.

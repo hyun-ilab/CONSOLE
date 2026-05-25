@@ -14,5 +14,6 @@ Prototype 14 is the active workbench for clarifying the tone and X/Y language co
 
 - Copied from Console13 on 2026-05-24.
 - Console13 should remain a source snapshot unless the user explicitly asks to change it.
+- Product stance: Console14 is a relationship-pressure control tool (`관계 압력을 조절하는 도구`), not a generic sentence-polishing tool.
 - Prototype 14 should make minimal visual changes: small labels/readouts are allowed, but the console body, LCD, dial, grid, and gauges should stay recognizable.
 - The main content change is the sentence system: replace abstract placeholder sentences with English examples that demonstrate tone, formality/social distance, and directness/pressure.
