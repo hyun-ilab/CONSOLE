@@ -24,6 +24,7 @@
 - 구조/라우팅/아카이브를 정리할 때는 영향을 받는 텍스트 파일을 제목이나 검색 결과만으로 판단하지 말고 전체 바이트를 읽는다. 검증은 `.\tools\audit_workspace_structure.ps1`를 우선 사용한다.
 - `Select-Object -First`, `rg` 결과, 파일명 목록은 탐색 증거일 뿐 전체 읽기 증거가 아니다.
 - 현재 할일을 찾을 때는 먼저 canonical command `rg --files -g TASKS.md 10_projects`만 실행한다. 필요할 때만 관련 `README.md`, `SPEC.md`, `30_logs/`, `50_library/`를 보조 근거로 연다.
+- 사용자가 `@chrome`, Chrome extension, Chrome 브라우저 조사를 명시하면 별도 `chrome` 도구를 먼저 찾지 말고 Browser 플러그인/스킬을 로드한 뒤 브라우저 런타임의 목록에서 `type: extension`, `name: Chrome` 항목을 선택한다. Chrome extension이 목록에 없을 때만 그 사실을 보고하고 in-app browser 등 대안을 쓴다.
 - Markdown task checkbox syntax는 활성 프로젝트의 `TASKS.md`에서만 사용한다. 참고용 점검표는 `CHECK:` 같은 일반 bullet로 쓴다.
 - 활성 프로젝트 `TASKS.md`의 체크박스 task 제목과 `TASK-NOTE:` 필드는 영어로 쓴다. 한국어는 사용자 원문이나 source wording을 짧게 인용해야 할 때만 둔다.
 - Codex가 새 실행 할일을 만들거나 추상/프로토타입 할일을 구체화할 때는 relational task notes를 붙인다: `aliases`, `target`, `role`, `links`, `not` 중 최소 3개를 짧게 남겨 사용자의 다음 짧은 표현이 어느 artifact/부품을 가리키는지 다시 붙잡을 수 있게 한다.
