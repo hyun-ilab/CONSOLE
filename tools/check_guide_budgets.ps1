@@ -5,27 +5,49 @@ param(
 
 $utf8Strict = [System.Text.UTF8Encoding]::new($false, $true)
 
+function New-BudgetRule {
+    param(
+        [string]$Rule,
+        [int]$MaxLines,
+        [int]$MaxChars,
+        [Nullable[int]]$MaxTasks = $null,
+        [Nullable[int]]$MaxOpenTasks = $null
+    )
+
+    return [PSCustomObject]@{
+        Rule = $Rule
+        MaxLines = $MaxLines
+        MaxChars = $MaxChars
+        MaxTasks = $MaxTasks
+        MaxOpenTasks = $MaxOpenTasks
+    }
+}
+
 function Get-RuleForGuideFile {
     param([string]$RelativePath, [string]$Name)
 
     if ($RelativePath -eq "README.md") {
-        return [PSCustomObject]@{ Rule = "root-readme"; MaxLines = 90; MaxChars = 4500 }
+        return New-BudgetRule -Rule "root-readme" -MaxLines 90 -MaxChars 4500
     }
 
     if ($Name -eq "README.md") {
-        return [PSCustomObject]@{ Rule = "nested-readme"; MaxLines = 55; MaxChars = 3000 }
+        return New-BudgetRule -Rule "nested-readme" -MaxLines 55 -MaxChars 3000
     }
 
     if ($Name -eq "AGENTS.md") {
-        return [PSCustomObject]@{ Rule = "agents"; MaxLines = 90; MaxChars = 5000 }
+        return New-BudgetRule -Rule "agents" -MaxLines 90 -MaxChars 5000
     }
 
     if ($Name -eq "MEMORY.md") {
-        return [PSCustomObject]@{ Rule = "memory"; MaxLines = 140; MaxChars = 7500 }
+        return New-BudgetRule -Rule "memory" -MaxLines 140 -MaxChars 7500
+    }
+
+    if ($Name -eq "TASKS.md") {
+        return New-BudgetRule -Rule "project-tasks" -MaxLines 140 -MaxChars 12000 -MaxTasks 24 -MaxOpenTasks 12
     }
 
     if ($Name -match "(?i)(GUIDE|INDEX|CATALOG|PROMPT|TEMPLATE|START_HERE|STATUS|DECISIONS).*\.md$") {
-        return [PSCustomObject]@{ Rule = "guide-like"; MaxLines = 80; MaxChars = 5000 }
+        return New-BudgetRule -Rule "guide-like" -MaxLines 80 -MaxChars 5000
     }
 
     return $null
@@ -62,8 +84,12 @@ $targetFiles |
         $text = $utf8Strict.GetString($bytes)
         $lineCount = ($text -split "`r?`n").Count
         $charCount = $text.Length
+        $taskCount = ([regex]::Matches($text, "(?m)^- \[[ xX]\]")).Count
+        $openTaskCount = ([regex]::Matches($text, "(?m)^- \[ \]")).Count
         $overLines = $lineCount -gt $rule.MaxLines
         $overChars = $charCount -gt $rule.MaxChars
+        $overTasks = $null -ne $rule.MaxTasks -and $taskCount -gt $rule.MaxTasks
+        $overOpenTasks = $null -ne $rule.MaxOpenTasks -and $openTaskCount -gt $rule.MaxOpenTasks
 
         $rows += [PSCustomObject]@{
             Path = $relative
@@ -72,14 +98,18 @@ $targetFiles |
             MaxLines = $rule.MaxLines
             Chars = $charCount
             MaxChars = $rule.MaxChars
-            Status = if ($overLines -or $overChars) { "OVER" } else { "OK" }
+            Tasks = $taskCount
+            MaxTasks = $rule.MaxTasks
+            Open = $openTaskCount
+            MaxOpen = $rule.MaxOpenTasks
+            Status = if ($overLines -or $overChars -or $overTasks -or $overOpenTasks) { "OVER" } else { "OK" }
         }
     }
 
 $rows = $rows | Sort-Object Status, Path
 
 if (-not $Quiet) {
-    $rows | Format-Table -AutoSize
+    $rows | Format-Table Status, Path, Rule, Lines, MaxLines, Chars, MaxChars, Tasks, MaxTasks, Open, MaxOpen -AutoSize
 }
 
 if ($rows | Where-Object { $_.Status -eq "OVER" }) {

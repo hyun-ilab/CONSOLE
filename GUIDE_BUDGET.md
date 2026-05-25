@@ -8,6 +8,7 @@ Goal: token efficiency level 5/10. Keep enough context for a future Codex run to
 - Nested `README.md`: max 55 lines, max 3,000 characters.
 - `AGENTS.md`: max 90 lines, max 5,000 characters.
 - `MEMORY.md`: max 140 lines, max 7,500 characters, max 50 active memory items.
+- Active project `TASKS.md`: max 140 lines, max 12,000 characters, max 24 checkbox tasks, max 12 open tasks.
 - Other guide-like Markdown files such as `*GUIDE*.md`, `*INDEX*.md`, `*CATALOG*.md`, `*PROMPT*.md`, `*TEMPLATE*.md`, `*START_HERE*.md`, `STATUS.md`, `DECISIONS.md`: max 80 lines, max 5,000 characters.
 
 ## Keep In Guide Files
@@ -23,7 +24,7 @@ Goal: token efficiency level 5/10. Keep enough context for a future Codex run to
 
 - Full histories and transcripts go to `30_logs/` or `90_archive/`.
 - Detailed research, reading notes, and source material go to `50_library/`.
-- Project details go to `10_projects/<slug>/SPEC.md`, `TASKS.md`, or a scoped project note.
+- Project details go to `10_projects/<slug>/SPEC.md`, `TASKS.md`, or a scoped project note; completed task history should be compacted or archived when `TASKS.md` exceeds its active-task budget.
 - Old links, stale examples, and duplicate explanations should be removed instead of preserved.
 - Reference checklists should use normal bullets or `CHECK:` labels unless they are live project tasks.
 
