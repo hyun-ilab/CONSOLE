@@ -51,6 +51,7 @@
 
 ## Current Hubs
 
+- Public GitHub Pages site: [https://hyun-ilab.github.io/CONSOLE/](https://hyun-ilab.github.io/CONSOLE/). This replaces routine Netlify production deploys for static prototype sharing.
 - Public agent handoff: [START_HERE.md](START_HERE.md). Use this when opening the repo with Codex or Claude Code from GitHub.
 - Active Project: [Console14](10_projects/console14/README.md). Current tasks are discovered with `rg --files -g TASKS.md 10_projects`.
 - Previous Source: [Console13](10_projects/console13/README.md). Archive only; copied from Console13 on 2026-05-24 into Console14.

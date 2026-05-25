@@ -14,6 +14,7 @@ This is the public, sanitized entry point for using this repository with Codex o
 
 - Codex: start from the repository root so `AGENTS.md` is loaded.
 - Claude Code: start from the repository root so `CLAUDE.md` imports `AGENTS.md`.
+- Public prototype: [https://hyun-ilab.github.io/CONSOLE/](https://hyun-ilab.github.io/CONSOLE/).
 - The canonical active-task command is:
 
 ```powershell
