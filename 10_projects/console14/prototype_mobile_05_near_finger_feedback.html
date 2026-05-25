@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Console14 Mobile Prototype 05 - Near Finger Feedback</title>
+    <link rel="stylesheet" href="mobile_onehanded_shared.css" />
+  </head>
+  <body>
+    <main class="prototype-shell variant-near-feedback" aria-label="Console14 mobile near finger feedback prototype based on prototype.html">
+      <header class="topbar">
+        <div class="brand">console</div>
+        <button class="listen" id="speakButton" type="button" aria-label="Play sentence">Listen</button>
+        <div class="top-readout mono" aria-label="state readout">
+          <span class="readout-item readout-tone"><small>Tone</small><b id="topTone"></b></span>
+          <span class="readout-item"><small>X axis</small><b id="topX"></b></span>
+          <span class="readout-item"><small>Y axis</small><b id="topY"></b></span>
+        </div>
+      </header>
+      <section class="display-panel" aria-label="sentence display">
+        <i class="mount-dot nw"></i><i class="mount-dot ne"></i><i class="mount-dot sw"></i><i class="mount-dot se"></i>
+        <div class="display-inner">
+          <div class="mount-label">LCD</div>
+          <p class="display-sentence" id="sentence" aria-live="polite"></p>
+          <div class="display-id" id="displayId"></div>
+        </div>
+      </section>
+      <section class="control-body">
+        <section class="field-bay" aria-label="grid control">
+          <div class="ticks-x"></div><div class="ticks-y"></div>
+          <div class="field" id="field" tabindex="0" role="slider" aria-label="Sentence grid position">
+            <div class="field-axis field-axis-x">X: FORMALITY</div>
+            <div class="field-axis field-axis-y">Y: PRESSURE</div>
+            <div class="field-current" id="fieldCurrent"></div>
+            <div class="reticle"></div>
+            <div class="thumb-bubble" id="thumbBubble"></div>
+          </div>
+          <div class="gauges">
+            <div class="gauge"><span>tone</span><div class="slot"><i class="cursor" style="--value: var(--tone-value)"></i></div></div>
+            <div class="gauge"><span>formality</span><div class="slot"><i class="cursor" style="--value: var(--grid-x-pos)"></i></div></div>
+            <div class="gauge"><span>directness</span><div class="slot"><i class="cursor" style="--value: var(--grid-y-pos)"></i></div></div>
+          </div>
+        </section>
+        <aside class="dial-bay" aria-label="tone control">
+          <div class="dial-wrap">
+            <div class="dial-grid" id="dialGrid" aria-hidden="true"></div>
+            <button class="dial" id="dial" type="button" role="slider" aria-label="Tone family dial with 60 fixed steps" aria-valuemin="1" aria-valuemax="60"></button>
+          </div>
+          <div class="tone-rail" id="toneRail" tabindex="0" role="slider" aria-label="Tone rail"><i class="cursor" style="--value: var(--tone-value)"></i></div>
+        </aside>
+      </section>
+    </main>
+    <script>window.CONSOLE_MOBILE_PROTOTYPE = { variant: "near-feedback", toneIndex: 42, gridXIndex: 4, gridYIndex: 5 };</script>
+    <script src="mobile_onehanded_shared.js"></script>
+  </body>
+</html>

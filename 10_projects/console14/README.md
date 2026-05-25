@@ -7,10 +7,22 @@ Prototype 14 is the active workbench for clarifying the tone and X/Y language co
 - Local prototype: [prototype.html](prototype.html)
 - Resonance build copy: [prototype_resonance.html](prototype_resonance.html) / [GitHub](https://github.com/hyun-ilab/CONSOLE/blob/codex/console14-task-decisions/10_projects/console14/prototype_resonance.html)
 - Resonance audit: [audit_resonance_build.ps1](audit_resonance_build.ps1)
+- Mobile prototype audit: [audit_mobile_prototypes.ps1](audit_mobile_prototypes.ps1)
 - Source prototype: [../console13/prototype.html](../console13/prototype.html)
 - Spec: [SPEC.md](SPEC.md)
 - Tasks: [TASKS.md](TASKS.md)
 - Reviewer/person notes and conversation logs are local-only and not published to GitHub.
+
+## Mobile One-Handed Prototypes
+
+GitHub Pages is enabled from `main`, so Pages links below become live after this branch is merged or promoted to the Pages source.
+
+- 01 Thumb zone: [local](prototype_mobile_01_thumb_zone.html) / [Pages](https://hyun-ilab.github.io/CONSOLE/10_projects/console14/prototype_mobile_01_thumb_zone.html)
+- 02 Cradled precision: [local](prototype_mobile_02_cradled_precision.html) / [Pages](https://hyun-ilab.github.io/CONSOLE/10_projects/console14/prototype_mobile_02_cradled_precision.html)
+- 03 Dial first: [local](prototype_mobile_03_dial_first.html) / [Pages](https://hyun-ilab.github.io/CONSOLE/10_projects/console14/prototype_mobile_03_dial_first.html)
+- 04 Grid first: [local](prototype_mobile_04_grid_first.html) / [Pages](https://hyun-ilab.github.io/CONSOLE/10_projects/console14/prototype_mobile_04_grid_first.html)
+- 05 Near-finger feedback: [local](prototype_mobile_05_near_finger_feedback.html) / [Pages](https://hyun-ilab.github.io/CONSOLE/10_projects/console14/prototype_mobile_05_near_finger_feedback.html)
+- 06 Pressure guard: [local](prototype_mobile_06_pressure_guard.html) / [Pages](https://hyun-ilab.github.io/CONSOLE/10_projects/console14/prototype_mobile_06_pressure_guard.html)
 
 ## Current State
 

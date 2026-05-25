@@ -60,6 +60,13 @@ The output should feel like a sentence transformed by tone and coordinate change
 - Speech QA: Web Speech API path can be verified by state and call path; audible prosody still needs human listening.
 - Promotion QA: browser evidence and script audit must both pass before replacing the preserved baseline.
 
+## Local Browser QA Route
+
+- Start local HTML checks through `tools/start_static_server.ps1`; open `http://127.0.0.1:<port>/...` in Browser instead of `file://`.
+- Mobile prototype variants should keep browser-critical assets local. Avoid external font/CDN links in throwaway UX prototypes unless the external dependency itself is being tested.
+- Browser automation should wait for DOM readiness, then inspect the target UI state. Do not make visual QA depend on full `load` completion when optional external assets could stall it.
+- For the six mobile one-handed prototype files, run `.\10_projects\console14\audit_mobile_prototypes.ps1` after structural edits.
+
 ## Safety Boundary
 
 - Firmness may clarify timing, priority, and next action.
