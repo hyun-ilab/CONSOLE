@@ -159,7 +159,10 @@ async def transform(req: TransformRequest):
             rewritten = rewrite_with_claude(req.text, style)
             if rewritten:
                 return {"text": rewritten, "original": req.text, "source": "claude"}
-        except Exception:
+        except Exception as exc:
+            status_code = getattr(exc, "status_code", None)
+            status_part = f" status={status_code}" if status_code else ""
+            print(f"[transform] Claude backend unavailable: {exc.__class__.__name__}{status_part}")
             warning_parts.append("Claude backend unavailable")
     else:
         warning_parts.append("ANTHROPIC_API_KEY not configured")
