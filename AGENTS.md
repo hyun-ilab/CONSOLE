@@ -24,6 +24,7 @@
 - 구조/라우팅/아카이브를 정리할 때는 영향을 받는 텍스트 파일을 제목이나 검색 결과만으로 판단하지 말고 전체 바이트를 읽는다. 검증은 `.\tools\audit_workspace_structure.ps1`를 우선 사용한다.
 - `Select-Object -First`, `rg` 결과, 파일명 목록은 탐색 증거일 뿐 전체 읽기 증거가 아니다.
 - 현재 할일을 찾을 때는 먼저 canonical command `rg --files -g TASKS.md 10_projects`만 실행한다. 필요할 때만 관련 `README.md`, `SPEC.md`, `30_logs/`, `50_library/`를 보조 근거로 연다.
+- 프로토타입 파일이 여러 개인 프로젝트는 프로젝트 `README.md`에 파일 역할 표를 두고, HTML 상단 주석에도 preserved baseline / working build / experiment / candidate 여부를 짧게 적어 파일만 열어도 정식 여부를 오해하지 않게 한다.
 - Markdown task checkbox syntax는 활성 프로젝트의 `TASKS.md`에서만 사용한다. 참고용 점검표는 `CHECK:` 같은 일반 bullet로 쓴다.
 - 활성 프로젝트 `TASKS.md`의 체크박스 task 제목과 `TASK-NOTE:` 필드는 영어로 쓴다. 한국어는 사용자 원문이나 source wording을 짧게 인용해야 할 때만 둔다.
 - Codex가 새 실행 할일을 만들거나 추상/프로토타입 할일을 구체화할 때는 relational task notes를 붙인다: `aliases`, `target`, `role`, `links`, `not` 중 최소 3개를 짧게 남겨 사용자의 다음 짧은 표현이 어느 artifact/부품을 가리키는지 다시 붙잡을 수 있게 한다.
