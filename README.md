@@ -51,10 +51,10 @@
 
 ## Current Hubs
 
-- Console14 backend experiment frontend: [Netlify public path](https://console-demo.netlify.app/10_projects/console14/prototype_backend_experiment.html). This is the current public backend experiment surface.
+- Console14 canonical static source: [10_projects/console14/prototype.html](10_projects/console14/prototype.html). This is the active source of truth for the promoted static prototype.
+- Console14 public static route: [GitHub Pages static site](https://hyun-ilab.github.io/CONSOLE/). It reflects `main`/Pages only after the promotion PR is merged.
+- Console14 backend experiment frontend: [Netlify public path](https://console-demo.netlify.app/10_projects/console14/prototype_backend_experiment.html). This is public experiment routing, not the canonical static source.
 - Console14 backend API: [Render service](https://console14-backend.onrender.com). It serves `GET /`, `GET /docs`, `POST /transform`, and `POST /tts`.
-- Public GitHub Pages static site: [https://hyun-ilab.github.io/CONSOLE/](https://hyun-ilab.github.io/CONSOLE/). Use this for static prototype sharing when backend services are not needed.
-- Console14 resonance build on GitHub: [prototype_resonance.html](https://github.com/hyun-ilab/CONSOLE/blob/main/10_projects/console14/prototype_resonance.html).
 - Public agent handoff: [START_HERE.md](START_HERE.md). Use this when opening the repo with Codex or Claude Code from GitHub.
 - Active Project: [Console14](10_projects/console14/README.md). Current tasks are discovered with `rg --files -g TASKS.md 10_projects`.
 - Previous Source: [Console13](10_projects/console13/README.md). Archive only; copied from Console13 on 2026-05-24 into Console14.

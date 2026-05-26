@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="en">
+  <!-- Console14 role: canonical active static prototype; local rule-based resonance route; no backend dependency. -->
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Console Prototype 14 - Striped LCD Grid</title>
+    <title>Console Prototype 14 - Resonance Build</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -482,7 +483,9 @@
 
       .dial:focus-visible,
       .field:focus-visible,
-      .listen:focus-visible {
+      .listen:focus-visible,
+      .scenario-button:focus-visible,
+      .custom-input:focus-visible {
         outline: 2px solid var(--accent);
         outline-offset: 5px;
       }
@@ -658,6 +661,165 @@
         transform: translateX(-50%);
       }
 
+      .reflection-panel {
+        display: grid;
+        gap: 10px;
+        min-width: 0;
+        padding: 0 clamp(18px, 2.4vw, 30px) clamp(16px, 2vw, 24px);
+      }
+
+      .reflection-controls {
+        display: grid;
+        grid-template-columns: minmax(340px, 0.92fr) minmax(280px, 1.08fr);
+        gap: 10px;
+        align-items: end;
+        min-width: 0;
+      }
+
+      .scenario-presets {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        min-width: 0;
+        border: 1px solid rgba(0, 0, 0, 0.32);
+        background: rgba(255, 255, 255, 0.18);
+      }
+
+      .scenario-button {
+        min-width: 0;
+        min-height: 34px;
+        border: 0;
+        border-right: 1px solid rgba(0, 0, 0, 0.2);
+        background: rgba(233, 232, 223, 0.62);
+        color: var(--muted);
+        cursor: pointer;
+        font-family: "Courier New", monospace;
+        font-size: 10px;
+        letter-spacing: 0.06em;
+        overflow: hidden;
+        padding: 0 7px;
+        text-overflow: clip;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .scenario-button:last-child {
+        border-right: 0;
+      }
+
+      .scenario-button.is-active {
+        background: var(--graphite);
+        color: #e9e8df;
+      }
+
+      .custom-input-wrap {
+        display: grid;
+        gap: 4px;
+        min-width: 0;
+        color: var(--muted);
+        font-family: "Courier New", monospace;
+        font-size: 9px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .custom-input {
+        width: 100%;
+        min-width: 0;
+        height: 34px;
+        border: 1px solid rgba(0, 0, 0, 0.34);
+        border-radius: 0;
+        background: rgba(233, 232, 223, 0.76);
+        color: var(--ink);
+        font-family: "Courier New", monospace;
+        font-size: 11px;
+        letter-spacing: 0.02em;
+        padding: 0 10px;
+      }
+
+      .custom-input::placeholder {
+        color: rgba(103, 104, 97, 0.68);
+      }
+
+      .reflection-readout,
+      .compare-strip {
+        display: grid;
+        min-width: 0;
+        border: 1px solid rgba(0, 0, 0, 0.28);
+        background: rgba(255, 255, 255, 0.16);
+      }
+
+      .reflection-readout {
+        grid-template-columns: 0.95fr 1.16fr 0.89fr;
+      }
+
+      .readout-cell,
+      .compare-cell {
+        min-width: 0;
+        border-right: 1px solid rgba(0, 0, 0, 0.18);
+        color: var(--muted);
+        font-family: "Courier New", monospace;
+      }
+
+      .readout-cell:last-child,
+      .compare-cell:last-child {
+        border-right: 0;
+      }
+
+      .readout-cell {
+        display: grid;
+        gap: 4px;
+        min-height: 42px;
+        padding: 7px 9px 6px;
+      }
+
+      .readout-cell span,
+      .compare-cell span {
+        font-size: 8px;
+        letter-spacing: 0.08em;
+        line-height: 1;
+        opacity: 0.75;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .readout-cell b {
+        display: block;
+        min-width: 0;
+        color: var(--ink);
+        font-size: 10px;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        line-height: 1.25;
+        overflow: hidden;
+        text-overflow: clip;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .compare-strip {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .compare-cell {
+        display: grid;
+        gap: 5px;
+        min-height: 56px;
+        padding: 7px 9px 8px;
+      }
+
+      .compare-cell p {
+        display: -webkit-box;
+        margin: 0;
+        min-width: 0;
+        color: var(--ink);
+        font-size: 10px;
+        letter-spacing: 0.01em;
+        line-height: 1.25;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+      }
+
       @media (max-width: 980px) {
         body {
           padding: 0;
@@ -740,6 +902,41 @@
           bottom: 10px;
         }
 
+        .reflection-panel {
+          padding: 0 14px 14px;
+        }
+
+        .reflection-controls {
+          grid-template-columns: 1fr;
+        }
+
+        .reflection-readout {
+          grid-template-columns: 1fr;
+        }
+
+        .readout-cell {
+          min-height: 34px;
+        }
+
+        .readout-cell,
+        .compare-cell {
+          border-right: 0;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+        }
+
+        .readout-cell:last-child,
+        .compare-cell:last-child {
+          border-bottom: 0;
+        }
+
+        .compare-strip {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .compare-cell:nth-child(2) {
+          border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+        }
+
         .body {
           grid-template-columns: 1fr;
           min-width: 0;
@@ -795,6 +992,38 @@
           font-size: 9px;
         }
 
+        .scenario-button {
+          min-height: 32px;
+          font-size: 8px;
+          letter-spacing: 0.02em;
+          padding: 0 3px;
+        }
+
+        .custom-input-wrap {
+          font-size: 8px;
+          letter-spacing: 0.04em;
+        }
+
+        .custom-input {
+          font-size: 10px;
+        }
+
+        .readout-cell b {
+          white-space: normal;
+        }
+
+        .compare-strip {
+          grid-template-columns: 1fr;
+        }
+
+        .compare-cell {
+          min-height: 48px;
+        }
+
+        .compare-cell:nth-child(2) {
+          border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+        }
+
         .field-axis,
         .field-current {
           font-size: 7.5px;
@@ -820,90 +1049,6 @@
           box-shadow: 0 0 0 1px rgba(21, 22, 18, 0.08);
         }
       }
-
-      .custom-input-panel {
-        margin: clamp(18px, 2.4vw, 30px);
-        padding: clamp(16px, 2vw, 24px);
-        border: 1px solid rgba(0, 0, 0, 0.3);
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.52), transparent 26%),
-          linear-gradient(135deg, var(--base-hi), var(--base) 58%, var(--base-lo));
-      }
-
-      .custom-input-label {
-        display: block;
-        margin-bottom: 12px;
-        color: var(--muted);
-        font-family: "Courier New", monospace;
-        font-size: 11px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-
-      .custom-input-field {
-        width: 100%;
-        min-height: 44px;
-        padding: 12px 16px;
-        border: 1px solid rgba(0, 0, 0, 0.36);
-        background: #fefdfb;
-        color: var(--ink);
-        font-family: "IBM Plex Mono", monospace;
-        font-size: 14px;
-        letter-spacing: 0.01em;
-        line-height: 1.4;
-        resize: vertical;
-        margin-bottom: 12px;
-      }
-
-      .custom-input-field:focus {
-        outline: 2px solid var(--accent);
-        outline-offset: 2px;
-      }
-
-      .custom-buttons {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-      }
-
-      .custom-button {
-        min-height: 40px;
-        border: 1px solid rgba(0, 0, 0, 0.46);
-        border-radius: 2px;
-        background: #e9e8df;
-        color: var(--ink);
-        padding: 0 16px;
-        cursor: pointer;
-        font-family: "Courier New", monospace;
-        font-size: 11px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 8px 16px rgba(0, 0, 0, 0.13);
-      }
-
-      .custom-button:active {
-        transform: translateY(1px);
-      }
-
-      .custom-button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
-
-      .custom-output {
-        margin-top: 16px;
-        padding: 12px 16px;
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        background: rgba(239, 238, 231, 0.4);
-        color: var(--ink);
-        font-family: "IBM Plex Mono", monospace;
-        font-size: 13px;
-        letter-spacing: 0.01em;
-        line-height: 1.4;
-        min-height: 44px;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-      }
     </style>
   </head>
   <body>
@@ -914,7 +1059,7 @@
           <div class="top-readout mono" aria-label="state readout">
             <span class="readout-item readout-tone">
               <b id="topTone">TONE 013 / 060 PLAIN</b>
-              <small>STYLE / ATTITUDE</small>
+              <small>RESONANCE / DISTANCE</small>
             </span>
             <span class="readout-item readout-x">
               <b id="topX">X 02 / 10 CASUAL</b>
@@ -945,6 +1090,61 @@
           </div>
         </section>
       </div>
+
+      <section class="reflection-panel" aria-label="language reflection controls">
+        <div class="reflection-controls">
+          <div class="scenario-presets" role="group" aria-label="Context preset">
+            <button class="scenario-button is-active" type="button" data-scenario="email">Email</button>
+            <button class="scenario-button" type="button" data-scenario="slack">Slack</button>
+            <button class="scenario-button" type="button" data-scenario="professor">Professor</button>
+            <button class="scenario-button" type="button" data-scenario="client">Client</button>
+            <button class="scenario-button" type="button" data-scenario="friend">Friend</button>
+          </div>
+          <label class="custom-input-wrap">
+            Custom sentence
+            <input
+              class="custom-input"
+              id="customInput"
+              type="text"
+              maxlength="120"
+              placeholder="Type a request, then use tone + X/Y"
+              autocomplete="off"
+            />
+          </label>
+        </div>
+        <div class="reflection-readout" aria-label="tone dimension readout">
+          <div class="readout-cell">
+            <span>Tone map</span>
+            <b id="toneDimension">Plain / balanced resonance</b>
+          </div>
+          <div class="readout-cell">
+            <span>Change</span>
+            <b id="deltaLabel">Neutral request with a clear timeline</b>
+          </div>
+          <div class="readout-cell">
+            <span>Boundary</span>
+            <b id="safetyLabel">Firm clarity; no guilt pressure</b>
+          </div>
+        </div>
+        <div class="compare-strip" aria-label="before and after comparison">
+          <div class="compare-cell">
+            <span>Original</span>
+            <p id="compareOriginal">Could you send me the revised draft?</p>
+          </div>
+          <div class="compare-cell">
+            <span>Current</span>
+            <p id="compareCurrent">Could you send me the revised draft by Friday if possible?</p>
+          </div>
+          <div class="compare-cell">
+            <span>Softer</span>
+            <p id="compareSofter">Could you send me the revised draft when you can?</p>
+          </div>
+          <div class="compare-cell">
+            <span>More direct</span>
+            <p id="compareDirect">Please send me the revised draft by Friday.</p>
+          </div>
+        </div>
+      </section>
 
       <section class="body">
         <aside class="dial-bay" aria-label="tone control">
@@ -997,21 +1197,6 @@
           </div>
         </section>
       </section>
-
-      <section class="custom-input-panel" aria-label="custom text transform">
-        <label class="custom-input-label">Enter your own text</label>
-        <textarea
-          class="custom-input-field"
-          id="customInput"
-          placeholder="Type your message here and click TRANSFORM or SPEAK to apply the current tone."
-          aria-label="Custom text input"
-        ></textarea>
-        <div class="custom-buttons">
-          <button class="custom-button" id="transformButton" type="button" aria-label="Transform text using BERT">TRANSFORM</button>
-          <button class="custom-button" id="speakCustomButton" type="button" aria-label="Speak the custom text">SPEAK</button>
-        </div>
-        <div class="custom-output" id="customOutput" aria-live="polite" aria-label="Transformed output"></div>
-      </section>
     </main>
 
     <script>
@@ -1033,161 +1218,74 @@
       const topY = document.getElementById("topY");
       const fieldCurrent = document.getElementById("fieldCurrent");
       const customInput = document.getElementById("customInput");
-      const transformButton = document.getElementById("transformButton");
-      const speakCustomButton = document.getElementById("speakCustomButton");
-      const customOutput = document.getElementById("customOutput");
-
-      function getToneName(index) {
-        const families = ["dry", "plain", "warm", "firm", "bright", "low"];
-        return families[Math.floor(index / 10)];
-      }
-
-      async function transformCustomText() {
-        const text = customInput.value.trim();
-        if (!text) { customOutput.textContent = "(empty input)"; return; }
-        transformButton.disabled = true;
-        customOutput.textContent = "Transforming...";
-        try {
-          const res = await fetch("http://localhost:8000/transform", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text, tone: getToneName(toneIndex), x: gridXIndex, y: gridYIndex })
-          });
-          if (!res.ok) { const err = await res.json().catch(() => ({})); customOutput.textContent = `Error: ${err.detail || res.statusText}`; return; }
-          const result = await res.json();
-          customOutput.textContent = result.text || text;
-        } catch (e) {
-          customOutput.textContent = `Server not running — start consoleBert (port 8000)`;
-        } finally {
-          transformButton.disabled = false;
-        }
-      }
-
-      async function speakCustom() {
-        const outputText = customOutput.textContent.trim();
-        const isOutputError = !outputText || outputText.startsWith("(") || outputText.startsWith("Error") || outputText.startsWith("Server");
-        const textToSpeak = isOutputError ? customInput.value.trim() : outputText;
-        if (!textToSpeak) return;
-
-        speakCustomButton.disabled = true;
-        setVoiceState("speaking");
-        customOutput.textContent = "Speaking...";
-
-        try {
-          const res = await fetch("http://localhost:8000/tts", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: textToSpeak, tone: getToneName(toneIndex) })
-          });
-
-          if (res.ok) {
-            const blob = await res.blob();
-            const audioUrl = URL.createObjectURL(blob);
-            const audio = new Audio(audioUrl);
-            audio.onended = () => {
-              URL.revokeObjectURL(audioUrl);
-              setVoiceState("idle");
-              speakCustomButton.disabled = false;
-              customOutput.textContent = textToSpeak;
-            };
-            audio.onerror = (e) => {
-              URL.revokeObjectURL(audioUrl);
-              customOutput.textContent = `Audio playback error: ${e.message || "unknown"}`;
-              speakCustomButton.disabled = false;
-              setVoiceState("idle");
-            };
-            audio.play();
-            return;
-          }
-
-          const err = await res.json().catch(() => ({}));
-          customOutput.textContent = `TTS error ${res.status}: ${err.detail || res.statusText}`;
-          speakCustomButton.disabled = false;
-          setVoiceState("idle");
-        } catch (e) {
-          customOutput.textContent = `TTS network error: ${e.message}`;
-          speakCustomButton.disabled = false;
-          setVoiceState("idle");
-        }
-      }
-
-      function speakWithWebSpeech(text) {
-        customOutput.textContent = text;
-        if (!("speechSynthesis" in window)) { setVoiceState("error"); speakCustomButton.disabled = false; return; }
-        const tone = toneFamily();
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = "en-US";
-        utterance.rate = tone.rate + (toneIndex % 10) * 0.006;
-        utterance.pitch = tone.pitch + (gridYIndex - (GRID_Y_STEPS - 1) / 2) * 0.04;
-        utterance.onstart = () => setVoiceState("speaking");
-        utterance.onend = () => { setVoiceState("idle"); speakCustomButton.disabled = false; };
-        utterance.onerror = () => { setVoiceState("error"); speakCustomButton.disabled = false; };
-        window.speechSynthesis.speak(utterance);
-      }
-
-      transformButton.addEventListener("click", transformCustomText);
-      speakCustomButton.addEventListener("click", speakCustom);
+      const scenarioButtons = Array.from(document.querySelectorAll(".scenario-button"));
+      const toneDimension = document.getElementById("toneDimension");
+      const deltaLabel = document.getElementById("deltaLabel");
+      const safetyLabel = document.getElementById("safetyLabel");
+      const compareOriginal = document.getElementById("compareOriginal");
+      const compareCurrent = document.getElementById("compareCurrent");
+      const compareSofter = document.getElementById("compareSofter");
+      const compareDirect = document.getElementById("compareDirect");
 
       const formalityAxis = [
         {
           label: "CLOSE",
-          ask: "Can you send me {item} {time}",
-          tell: "Send me {item} {time}",
+          ask: "Can you {intent} {time}",
+          tell: "{imperative} {time}",
           question: true
         },
         {
           label: "CASUAL",
-          ask: "Could you send me {item} {time}",
-          tell: "Please send me {item} {time}",
+          ask: "Could you {intent} {time}",
+          tell: "Please {intent} {time}",
           question: true
         },
         {
           label: "RELAXED",
-          ask: "Could you please send me {item} {time}",
-          tell: "Please send me {item} {time}",
+          ask: "Could you please {intent} {time}",
+          tell: "Please {intent} {time}",
           question: true
         },
         {
           label: "NEUTRAL",
-          ask: "Please send me {item} {time}",
-          tell: "Please send me {item} {time}",
+          ask: "Please {intent} {time}",
+          tell: "Please {intent} {time}",
           question: false
         },
         {
           label: "CLEAR",
-          ask: "Please send {item} to me {time}",
-          tell: "Please send {item} to me {time}",
+          ask: "Please {intent} {time}",
+          tell: "Please {intent} {time}",
           question: false
         },
         {
           label: "COURTEOUS",
-          ask: "Would you please send {item} to me {time}",
-          tell: "Please send {item} to me {time}",
+          ask: "Would you please {intent} {time}",
+          tell: "Please {intent} {time}",
           question: true
         },
         {
           label: "POLISHED",
-          ask: "Could you please send {item} to me {time}",
-          tell: "Please send {item} to me {time}",
+          ask: "Could you please {intent} {time}",
+          tell: "Please {intent} {time}",
           question: true
         },
         {
           label: "FORMAL",
-          ask: "Would you be able to send {item} to me {time}",
-          tell: "Please send {item} to me {time}",
+          ask: "Would you be able to {intent} {time}",
+          tell: "Please {intent} {time}",
           question: true
         },
         {
           label: "DISTANT",
-          ask: "Please arrange to send {item} to me {time}",
-          tell: "Please arrange to send {item} to me {time}",
+          ask: "Please arrange to {intent} {time}",
+          tell: "Please arrange to {intent} {time}",
           question: false
         },
         {
           label: "OFFICIAL",
-          ask: "Please ensure {item} is sent to me {time}",
-          tell: "Please ensure {item} is sent to me {time}",
+          ask: "Please ensure you {intent} {time}",
+          tell: "Please ensure you {intent} {time}",
           question: false
         }
       ];
@@ -1205,141 +1303,197 @@
         { label: "NO LATER", time: "by Friday, no later", force: 9 }
       ];
 
-      const toneClosers = {
-        dry: [
-          "Draft only.",
-          "No context needed.",
-          "Use the latest version.",
-          "Keep it brief.",
-          "Send the file.",
-          "No cover note.",
-          "Plain copy is fine.",
-          "Just the draft.",
-          "Attach the file.",
-          "End there."
-        ],
-        plain: [
-          "That works.",
-          "Please confirm.",
-          "The current draft is fine.",
-          "Send the latest version.",
-          "A short note is enough.",
-          "No extra formatting needed.",
-          "Please include the file.",
-          "Use the shared version.",
-          "That should cover it.",
-          "That will be enough."
-        ],
-        warm: [
-          "Thanks.",
-          "I appreciate it.",
-          "That would help.",
-          "Thank you.",
-          "I would appreciate it.",
-          "Thanks for making room for it.",
-          "That would really help.",
-          "Thank you for prioritizing it.",
-          "I appreciate you handling it.",
-          "Thanks for taking care of it."
-        ],
-        firm: [
-          "I need it for the next step.",
-          "Please prioritize it.",
-          "I am counting on it.",
-          "This needs to stay on track.",
-          "Please make this the priority.",
-          "I need it to move forward.",
-          "Please treat this as time-sensitive.",
-          "This is the deadline.",
-          "Please do not let this slip.",
-          "No later than that."
-        ],
-        bright: [
-          "That would be great.",
-          "Thanks so much.",
-          "Perfect, thanks.",
-          "That would be a big help.",
-          "Really appreciate it.",
-          "Great if you can.",
-          "Thanks, that keeps us moving.",
-          "That would be excellent.",
-          "Appreciate the quick turn.",
-          "Thanks for jumping on it."
-        ],
-        low: [
-          "No rush beyond that.",
-          "Keep it simple.",
-          "That is enough.",
-          "Steady is fine.",
-          "No extra polish needed.",
-          "Just the draft is fine.",
-          "Please keep it focused.",
-          "I only need the draft.",
-          "Keep the handoff quiet.",
-          "That closes the loop."
-        ]
-      };
-
       const toneFamilies = [
         {
           name: "dry",
           label: "DRY",
+          dimension: "CLINICAL DISTANCE",
+          resonance: 1,
+          clinical: 9,
+          pressure: 3,
+          rhythm: "short",
           font: '"IBM Plex Mono", monospace',
           weight: 600,
           tracking: "0.01em",
           rate: 0.84,
-          pitch: 0.82
+          pitch: 0.82,
+          closers: [
+            "No context needed.",
+            "Keep it brief.",
+            "Use the latest version.",
+            "Draft only.",
+            "No cover note.",
+            "Plain copy is fine.",
+            "Attach the file.",
+            "Just the draft.",
+            "Send the file.",
+            "End there."
+          ]
         },
         {
           name: "plain",
           label: "PLAIN",
+          dimension: "BALANCED PLAIN",
+          resonance: 4,
+          clinical: 5,
+          pressure: 4,
+          rhythm: "even",
           font: '"Inter", Arial, sans-serif',
           weight: 600,
           tracking: "0.01em",
           rate: 0.9,
-          pitch: 0.9
+          pitch: 0.9,
+          closers: [
+            "That works.",
+            "Please confirm.",
+            "A short note is enough.",
+            "The current version is fine.",
+            "No extra formatting needed.",
+            "Please include the file.",
+            "Use the shared version.",
+            "That should cover it.",
+            "That will be enough.",
+            "Thanks."
+          ]
         },
         {
           name: "warm",
           label: "WARM",
+          dimension: "EMOTIONAL RESONANCE",
+          resonance: 9,
+          clinical: 2,
+          pressure: 3,
+          rhythm: "soft",
           font: '"Newsreader", Georgia, serif',
           weight: 600,
           tracking: "0.01em",
           rate: 0.94,
-          pitch: 1
+          pitch: 1,
+          closers: [
+            "I appreciate the help.",
+            "I appreciate it.",
+            "That would help me plan.",
+            "Thank you.",
+            "I would really appreciate it.",
+            "Thanks for making room for it.",
+            "That would mean a lot.",
+            "Thank you for prioritizing it.",
+            "I appreciate you handling it.",
+            "Thanks for taking care of it."
+          ]
         },
         {
           name: "firm",
           label: "FIRM",
+          dimension: "CLEAR PRESSURE",
+          resonance: 3,
+          clinical: 6,
+          pressure: 9,
+          rhythm: "compressed",
           font: '"IBM Plex Sans Condensed", Arial Narrow, sans-serif',
           weight: 600,
           tracking: "0.01em",
           rate: 0.88,
-          pitch: 0.86
+          pitch: 0.86,
+          closers: [
+            "I need it for the next step.",
+            "Please prioritize it.",
+            "This needs to stay on track.",
+            "I am counting on that timing.",
+            "Please make this the priority.",
+            "I need it to move forward.",
+            "Please treat this as time-sensitive.",
+            "That is the deadline.",
+            "Please do not let this slip.",
+            "No later than that."
+          ]
         },
         {
           name: "bright",
           label: "BRIGHT",
+          dimension: "HIGH RESONANCE",
+          resonance: 8,
+          clinical: 2,
+          pressure: 5,
+          rhythm: "quick",
           font: '"Space Grotesk", Arial, sans-serif',
           weight: 600,
           tracking: "0.01em",
           rate: 0.98,
-          pitch: 1.06
+          pitch: 1.06,
+          closers: [
+            "That would be great.",
+            "Thanks so much.",
+            "Perfect, thanks.",
+            "That would be a big help.",
+            "Really appreciate it.",
+            "Great if you can.",
+            "Thanks, that keeps us moving.",
+            "That would be excellent.",
+            "Appreciate the quick turn.",
+            "Thanks for jumping on it."
+          ]
         },
         {
           name: "low",
           label: "LOW",
+          dimension: "LOW-PRESSURE RESONANCE",
+          resonance: 7,
+          clinical: 3,
+          pressure: 1,
+          rhythm: "slow",
           font: '"IBM Plex Serif", Georgia, serif',
           weight: 600,
           tracking: "0.01em",
           rate: 0.8,
-          pitch: 0.76
+          pitch: 0.76,
+          closers: [
+            "No rush beyond that.",
+            "Keep it simple.",
+            "That is enough.",
+            "Steady is fine.",
+            "No extra polish needed.",
+            "Just the draft is fine.",
+            "Please keep it focused.",
+            "I only need the essentials.",
+            "Keep the handoff quiet.",
+            "That closes the loop."
+          ]
         }
       ];
+
+      const scenarios = {
+        email: {
+          label: "EMAIL",
+          original: "Could you send me the revised draft?",
+          intent: "send me the revised draft"
+        },
+        slack: {
+          label: "SLACK",
+          original: "Can you drop the latest file in Slack?",
+          intent: "drop the latest file in Slack"
+        },
+        professor: {
+          label: "PROFESSOR",
+          original: "Could you review my abstract?",
+          intent: "review my abstract"
+        },
+        client: {
+          label: "CLIENT",
+          original: "Can you approve the scope note?",
+          intent: "approve the scope note"
+        },
+        friend: {
+          label: "FRIEND",
+          original: "Can you send me the photos?",
+          intent: "send me the photos"
+        }
+      };
 
       let toneIndex = 12;
       let gridXIndex = 1;
       let gridYIndex = 3;
+      let activeScenario = "email";
       let draggingDial = false;
       let draggingField = false;
       let fitFrame = 0;
@@ -1370,26 +1524,67 @@
       }
 
       function fillTemplate(template, values) {
-        return template.replace(/\{item\}/g, values.item).replace(/\{time\}/g, values.time);
+        return template
+          .replace(/\{intent\}/g, values.intent)
+          .replace(/\{imperative\}/g, values.imperative)
+          .replace(/\{time\}/g, values.time);
       }
 
       function finishSentence(text, question = false) {
-        const clean = text.replace(/\s+/g, " ").trim();
+        const clean = text.replace(/\s+/g, " ").replace(/\s+([?.!])/g, "$1").trim();
         return `${clean}${question ? "?" : "."}`;
       }
 
-      function sentence(t, x, y) {
+      function sanitizeSource(text) {
+        return text.replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, 120);
+      }
+
+      function normalizeIntent(text) {
+        let clean = sanitizeSource(text).replace(/[?.!]+$/g, "").trim();
+        clean = clean.replace(/^(can|could|would|will)\s+you\s+/i, "");
+        clean = clean.replace(/^please\s+/i, "");
+        clean = clean.replace(/^i\s+need\s+you\s+to\s+/i, "");
+        clean = clean.replace(/^we\s+need\s+to\s+/i, "");
+        clean = clean.replace(/^i\s+need\s+/i, "send me ");
+        clean = clean.replace(/\s+(when you have a moment|when you have time|when you can|tomorrow morning|tomorrow|today|this week|next week)$/i, "");
+        clean = clean.replace(/\s+(by|before)\s+(noon\s+)?(monday|tuesday|wednesday|thursday|friday|saturday|sunday)(\s+morning|\s+afternoon|\s+evening)?$/i, "");
+        if (!clean) return "handle this";
+        return clean.charAt(0).toLowerCase() + clean.slice(1);
+      }
+
+      function capitalizeIntent(intent) {
+        return intent.charAt(0).toUpperCase() + intent.slice(1);
+      }
+
+      function currentSource() {
+        const custom = sanitizeSource(customInput.value);
+        if (custom) {
+          return {
+            label: "CUSTOM",
+            original: custom,
+            intent: normalizeIntent(custom)
+          };
+        }
+        return scenarios[activeScenario];
+      }
+
+      function sentence(t, x, y, source = currentSource()) {
+        return transformSentence(t, x, y, source);
+      }
+
+      function transformSentence(t, x, y, source = currentSource()) {
         const tone = toneFamily(t);
         const step = t % 10;
         const formality = formalityAxis[x];
         const directness = directnessAxis[y];
         const values = {
-          item: "the draft",
+          intent: source.intent,
+          imperative: capitalizeIntent(source.intent),
           time: directness.time
         };
         const highPressure = directness.force >= 7;
         const mediumPressure = directness.force >= 4;
-        const closer = toneClosers[tone.name][step];
+        const closer = tone.closers[step];
         let line = "";
 
         if (tone.name === "dry") {
@@ -1407,6 +1602,66 @@
         }
 
         return closer ? `${line} ${closer}` : line;
+      }
+
+      function comparisonVariants(t, x, y, source = currentSource()) {
+        return {
+          original: source.original,
+          current: transformSentence(t, x, y, source),
+          softer: transformSentence(t, x, clampIndex(y - 2, GRID_Y_STEPS), source),
+          direct: transformSentence(t, x, clampIndex(y + 2, GRID_Y_STEPS), source)
+        };
+      }
+
+      function toneDimensionLabel(tone) {
+        const resonance = tone.resonance >= 8 ? "HIGH RESONANCE" : tone.resonance <= 2 ? "LOW RESONANCE" : "MID RESONANCE";
+        const distance = tone.clinical >= 8 ? "CLINICAL" : tone.clinical <= 3 ? "RELATIONAL" : "BALANCED";
+        return `${tone.label} / ${tone.dimension} / ${resonance} / ${distance}`;
+      }
+
+      function explanationLabel(t, x, y) {
+        const tone = toneFamily(t);
+        const formality = formalityAxis[x];
+        const directness = directnessAxis[y];
+        const affect =
+          tone.clinical >= 8
+            ? "More clinical distance"
+            : tone.resonance >= 8
+              ? "More emotional resonance"
+              : tone.pressure >= 8
+                ? "Firmer pressure"
+                : "Balanced tone";
+        const distance = x >= 7 ? "more social distance" : x <= 2 ? "closer address" : "neutral distance";
+        const pressure = directness.force >= 7 ? "deadline pressure" : directness.force <= 2 ? "low pressure" : "clear timing";
+        return `${affect}; ${distance}; ${pressure}`;
+      }
+
+      function safetyBoundaryLabel(t, x, y) {
+        const tone = toneFamily(t);
+        const force = directnessAxis[y].force;
+        if (tone.resonance >= 8 && x <= 2) return "Warmth stays specific; no fake intimacy";
+        if (tone.clinical >= 8) return "Distance stays clear; not dismissive";
+        if (force >= 8 || tone.pressure >= 8) return "Firm clarity; no guilt pressure";
+        if (force <= 2) return "Soft request; no hidden urgency";
+        return "Clear ask; no coercive pressure";
+      }
+
+      function prosodyForState(t, x, y) {
+        const tone = toneFamily(t);
+        const force = directnessAxis[y].force;
+        return {
+          rate: clamp(tone.rate + (t % 10) * 0.006 + force * 0.004, 0.68, 1.18),
+          pitch: clamp(tone.pitch + (force - 4.5) * 0.025 + (tone.resonance - tone.clinical) * 0.01, 0.62, 1.22),
+          volume: 1
+        };
+      }
+
+      function speechTextForState(text, t) {
+        const tone = toneFamily(t);
+        if (tone.name === "low") return text.replace(/\. /g, ". ... ");
+        if (tone.name === "dry") return text.replace(/\? /g, ". ").replace(/, /g, ". ");
+        if (tone.name === "warm") return text.replace(/\. Thank/g, ". Thank");
+        return text;
       }
 
       function buildDialGrid() {
@@ -1478,7 +1733,9 @@
         root.style.setProperty("--sentence-weight", String(tone.weight));
         root.style.setProperty("--sentence-tracking", tone.tracking);
 
-        const currentSentence = sentence(toneIndex, gridXIndex, gridYIndex);
+        const source = currentSource();
+        const currentSentence = sentence(toneIndex, gridXIndex, gridYIndex, source);
+        const variants = comparisonVariants(toneIndex, gridXIndex, gridYIndex, source);
         const toneCount = toneIndex + 1;
         const xCount = gridXIndex + 1;
         const yCount = gridYIndex + 1;
@@ -1489,9 +1746,16 @@
         topX.textContent = `X ${pad(xCount)} / ${pad(GRID_X_STEPS)} ${formalityAxis[gridXIndex].label}`;
         topY.textContent = `Y ${pad(yCount)} / ${pad(GRID_Y_STEPS)} ${directnessAxis[gridYIndex].label}`;
         fieldCurrent.textContent = `X ${formalityAxis[gridXIndex].label} / Y ${directnessAxis[gridYIndex].label}`;
-        displayId.textContent = `SIG / T${pad(toneCount, 2)} X${pad(xCount)} Y${pad(yCount)} / ${MATRIX_TOTAL}`;
+        toneDimension.textContent = toneDimensionLabel(tone);
+        deltaLabel.textContent = explanationLabel(toneIndex, gridXIndex, gridYIndex);
+        safetyLabel.textContent = safetyBoundaryLabel(toneIndex, gridXIndex, gridYIndex);
+        compareOriginal.textContent = variants.original;
+        compareCurrent.textContent = variants.current;
+        compareSofter.textContent = variants.softer;
+        compareDirect.textContent = variants.direct;
+        displayId.textContent = `${source.label} / T${pad(toneCount, 2)} X${pad(xCount)} Y${pad(yCount)} / ${MATRIX_TOTAL}`;
         dial.setAttribute("aria-valuenow", String(toneCount));
-        dial.setAttribute("aria-valuetext", `Tone ${toneCount} of 60, ${tone.label.toLowerCase()} style and attitude`);
+        dial.setAttribute("aria-valuetext", `Tone ${toneCount} of 60, ${tone.label.toLowerCase()}, ${tone.dimension.toLowerCase()}`);
         field.setAttribute(
           "aria-valuetext",
           `X ${xCount} of ${GRID_X_STEPS}, formality ${formalityAxis[gridXIndex].label.toLowerCase()}; Y ${yCount} of ${GRID_Y_STEPS}, directness ${directnessAxis[gridYIndex].label.toLowerCase()}`
@@ -1521,16 +1785,39 @@
           setVoiceState("error");
           return;
         }
-        const tone = toneFamily();
+        const voice = prosodyForState(toneIndex, gridXIndex, gridYIndex);
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(sentenceEl.textContent);
+        const utterance = new SpeechSynthesisUtterance(speechTextForState(sentenceEl.textContent, toneIndex));
         utterance.lang = "en-US";
-        utterance.rate = tone.rate + (toneIndex % 10) * 0.006;
-        utterance.pitch = tone.pitch + (gridYIndex - (GRID_Y_STEPS - 1) / 2) * 0.04;
+        utterance.rate = voice.rate;
+        utterance.pitch = voice.pitch;
+        utterance.volume = voice.volume;
         utterance.onstart = () => setVoiceState("speaking");
         utterance.onend = () => setVoiceState("idle");
         utterance.onerror = () => setVoiceState("error");
         window.speechSynthesis.speak(utterance);
+      }
+
+      function auditSentences() {
+        const issues = [];
+        let total = 0;
+        Object.values(scenarios).forEach((source) => {
+          for (let x = 0; x < GRID_X_STEPS; x += 1) {
+            for (let y = 0; y < GRID_Y_STEPS; y += 1) {
+              let previous = "";
+              for (let t = 0; t < 60; t += 1) {
+                const text = transformSentence(t, x, y, source);
+                total += 1;
+                if (!text || /undefined|null|\{/.test(text)) issues.push(`${source.label} T${t + 1} X${x + 1} Y${y + 1}: malformed`);
+                if (/\s{2,}/.test(text) || /[?.!]{2,}/.test(text)) issues.push(`${source.label} T${t + 1} X${x + 1} Y${y + 1}: punctuation`);
+                if (text.length > 180) issues.push(`${source.label} T${t + 1} X${x + 1} Y${y + 1}: long text`);
+                if (previous === text) issues.push(`${source.label} T${t + 1} X${x + 1} Y${y + 1}: adjacent duplicate`);
+                previous = text;
+              }
+            }
+          }
+        });
+        return { total, issueCount: issues.length, issues: issues.slice(0, 40) };
       }
 
       dial.addEventListener("pointerdown", (event) => {
@@ -1609,6 +1896,16 @@
         }
       });
 
+      scenarioButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          activeScenario = button.dataset.scenario;
+          customInput.value = "";
+          scenarioButtons.forEach((item) => item.classList.toggle("is-active", item === button));
+          update();
+        });
+      });
+
+      customInput.addEventListener("input", update);
       speakButton.addEventListener("click", speakSentence);
       window.addEventListener("resize", () => {
         positionDialGrid();
@@ -1618,6 +1915,13 @@
         document.fonts.ready.then(fitDisplayText);
       }
 
+      window.console14 = {
+        auditSentences,
+        comparisonVariants,
+        prosodyForState,
+        scenarios,
+        transformSentence
+      };
       buildDialGrid();
       update();
     </script>

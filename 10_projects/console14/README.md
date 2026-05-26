@@ -4,30 +4,30 @@ Prototype 14 is the active workbench for clarifying the tone and X/Y language co
 
 ## Quick Links
 
-- Local prototype: [prototype.html](prototype.html)
-- Resonance build copy: [prototype_resonance.html](prototype_resonance.html) / [GitHub](https://github.com/hyun-ilab/CONSOLE/blob/main/10_projects/console14/prototype_resonance.html)
-- Backend experiment: [prototype_backend_experiment.html](prototype_backend_experiment.html) / [Netlify](https://console-demo.netlify.app/10_projects/console14/prototype_backend_experiment.html)
-- Backend API: [Render](https://console14-backend.onrender.com)
-- Resonance audit: [audit_resonance_build.ps1](audit_resonance_build.ps1)
-- Mobile prototype audit: [audit_mobile_prototypes.ps1](audit_mobile_prototypes.ps1)
-- Mobile version selector: [mobile_prototypes.html](mobile_prototypes.html) / [Pages](https://hyun-ilab.github.io/CONSOLE/10_projects/console14/mobile_prototypes.html)
-- Source prototype: [../console13/prototype.html](../console13/prototype.html)
-- Spec: [SPEC.md](SPEC.md)
-- Tasks: [TASKS.md](TASKS.md)
+- Canonical static prototype: [prototype.html](prototype.html)
+- Archived historical baseline: [archive/prototype_2026-05-26_preserved_console13_snapshot.html](archive/prototype_2026-05-26_preserved_console13_snapshot.html)
+- Backend experiment/API: [prototype_backend_experiment.html](prototype_backend_experiment.html), [Netlify](https://console-demo.netlify.app/10_projects/console14/prototype_backend_experiment.html), [Render](https://console14-backend.onrender.com)
+- Audits: [audit_resonance_build.ps1](audit_resonance_build.ps1), [audit_mobile_prototypes.ps1](audit_mobile_prototypes.ps1)
+- Mobile selector: [mobile_prototypes.html](mobile_prototypes.html) / [Pages](https://hyun-ilab.github.io/CONSOLE/10_projects/console14/mobile_prototypes.html)
+- Project docs: [SPEC.md](SPEC.md), [TASKS.md](TASKS.md), [../console13/prototype.html](../console13/prototype.html)
 - Reviewer/person notes and conversation logs are local-only and not published to GitHub.
 
 ## Mobile One-Handed Prototypes
 
-Open [mobile_prototypes.html](mobile_prototypes.html) on a phone to choose among the six versions. Its Pages URL is `https://hyun-ilab.github.io/CONSOLE/10_projects/console14/mobile_prototypes.html` after the branch is merged or promoted to the Pages source.
+Open [mobile_prototypes.html](mobile_prototypes.html) to compare the six UX-only layout candidates. They use a simplified sentence engine, are not feature-equal to the canonical [prototype.html](prototype.html), and any selected mobile UX should be folded back into `prototype.html`.
+
+## Prototype Roles
+
+- `prototype.html`: canonical active static prototype and source of truth for the promoted resonance route.
+- `archive/prototype_2026-05-26_preserved_console13_snapshot.html`: historical preserved Console13/early Console14 snapshot with old BERT/local `consoleBert` traces.
+- `prototype_backend_experiment.html`: backend experiment only, using the Render API and provider fallback path.
+- `mobile_prototypes.html` plus `prototype_mobile_01` through `prototype_mobile_06`: UX-only mobile layout candidates using a simplified sentence engine.
 
 ## Current State
 
 - Copied from Console13 on 2026-05-24.
-- Console13 should remain a source snapshot unless the user explicitly asks to change it.
-- `prototype.html` remains the preserved Console14 baseline; the resonance build is a copied working file.
-- `prototype_backend_experiment.html` is the public backend experiment surface. It points to the Render backend by meta tag and keeps query-string backend override for local/error testing.
-- The Render backend uses Claude first and returns `source: "echo"` if Claude is unavailable. ElevenLabs `/tts` is the active speech path.
-- Run `.\10_projects\console14\audit_resonance_build.ps1` before promoting the copied build over the baseline.
+- `prototype_resonance.html` was promoted into `prototype.html` on 2026-05-26; the old `prototype.html` is archived and hash-protected.
+- `prototype_backend_experiment.html` is public experiment routing, not the static source of truth.
+- Run `.\10_projects\console14\audit_resonance_build.ps1` before treating the promoted static prototype as clean. The script name is legacy; it now audits the promoted canonical static prototype.
 - Product stance: Console14 is a relationship-pressure control tool (`관계 압력을 조절하는 도구`), not a generic sentence-polishing tool.
-- Prototype 14 should make minimal visual changes: small labels/readouts are allowed, but the console body, LCD, dial, grid, and gauges should stay recognizable.
-- The main content change is the sentence system: replace abstract placeholder sentences with English examples that demonstrate tone, formality/social distance, and directness/pressure.
+- Keep the console body, LCD, dial, grid, and gauges recognizable while clarifying tone, formality/social distance, and directness/pressure.

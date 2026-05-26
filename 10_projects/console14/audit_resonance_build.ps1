@@ -6,11 +6,17 @@ $ErrorActionPreference = "Stop"
 
 $project = (Resolve-Path -LiteralPath $ProjectRoot).Path
 $workspace = (Resolve-Path -LiteralPath (Join-Path $project "..\..")).Path
-$baseline = Join-Path $project "prototype.html"
-$resonance = Join-Path $project "prototype_resonance.html"
+$canonical = Join-Path $project "prototype.html"
+$deprecatedRootCopy = Join-Path $project "prototype_resonance.html"
+$archive = Join-Path $project "archive"
+$historicalSnapshot = Join-Path $archive "prototype_2026-05-26_preserved_console13_snapshot.html"
+$resonanceArchive = Join-Path $archive "prototype_resonance_2026-05-26_pre_promotion_copy.html"
+$manifest = Join-Path $archive "prototype_manifest.sha256"
 $readme = Join-Path $project "README.md"
 $spec = Join-Path $project "SPEC.md"
 $tasks = Join-Path $project "TASKS.md"
+$rootReadme = Join-Path $workspace "README.md"
+$projectsReadme = Join-Path $workspace "10_projects\README.md"
 
 $rows = New-Object System.Collections.Generic.List[object]
 $failures = New-Object System.Collections.Generic.List[string]
@@ -53,48 +59,59 @@ function Test-ContainsAll {
     }
 }
 
-Add-Check "baseline file exists" (Test-Path -LiteralPath $baseline) "prototype.html is present"
-Add-Check "working copy exists" (Test-Path -LiteralPath $resonance) "prototype_resonance.html is present"
+function Get-ManifestMap {
+    param([string]$Path)
 
-if (Test-Path -LiteralPath $baseline) {
-    $relativeBaseline = "10_projects/console14/prototype.html"
-    & git -C $workspace diff --quiet -- $relativeBaseline
-    Add-Check "baseline unchanged in git diff" ($LASTEXITCODE -eq 0) "$relativeBaseline has no unstaged diff"
+    $map = @{}
+    foreach ($line in [System.IO.File]::ReadAllLines($Path)) {
+        if ($line -match "^\s*([0-9a-fA-F]{64})\s+\*?(.+?)\s*$") {
+            $map[$Matches[2]] = $Matches[1].ToLowerInvariant()
+        }
+    }
+    return $map
 }
 
-if (Test-Path -LiteralPath $readme) {
-    $check = Test-ContainsAll -Path $readme -Needles @(
-        "Resonance build copy",
-        '`prototype.html` remains the preserved Console14 baseline'
+function Test-ManifestHash {
+    param(
+        [hashtable]$Map,
+        [string]$FilePath
     )
-    Add-Check "README build routing" $check.Pass ("missing: " + ($check.Missing -join ", "))
+
+    $name = [System.IO.Path]::GetFileName($FilePath)
+    if (-not $Map.ContainsKey($name)) {
+        return [PSCustomObject]@{ Pass = $false; Detail = "manifest missing $name" }
+    }
+
+    $actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $FilePath).Hash.ToLowerInvariant()
+    $expected = $Map[$name]
+    return [PSCustomObject]@{
+        Pass = $actual -eq $expected
+        Detail = "expected=$expected; actual=$actual"
+    }
 }
 
-if (Test-Path -LiteralPath $spec) {
-    $check = Test-ContainsAll -Path $spec -Needles @(
-        'Preserved baseline: `prototype.html`.',
-        'Working build copy: `prototype_resonance.html`.',
-        "Static-only route",
-        "Voice route: browser Web Speech only",
-        "## Build Governance",
-        "## Verification Tiers"
-    )
-    Add-Check "SPEC governance" $check.Pass ("missing: " + ($check.Missing -join ", "))
+Add-Check "canonical prototype exists" (Test-Path -LiteralPath $canonical -PathType Leaf) "prototype.html is present"
+Add-Check "deprecated root resonance copy absent" (-not (Test-Path -LiteralPath $deprecatedRootCopy)) "prototype_resonance.html should not remain as an active root file"
+Add-Check "archive directory exists" (Test-Path -LiteralPath $archive -PathType Container) "archive directory is present"
+Add-Check "historical snapshot exists" (Test-Path -LiteralPath $historicalSnapshot -PathType Leaf) "old prototype.html snapshot is archived"
+Add-Check "pre-promotion copy archived" (Test-Path -LiteralPath $resonanceArchive -PathType Leaf) "pre-promotion resonance copy is archived"
+Add-Check "archive manifest exists" (Test-Path -LiteralPath $manifest -PathType Leaf) "prototype_manifest.sha256 is present"
+
+if ((Test-Path -LiteralPath $manifest -PathType Leaf) -and
+    (Test-Path -LiteralPath $historicalSnapshot -PathType Leaf) -and
+    (Test-Path -LiteralPath $resonanceArchive -PathType Leaf)) {
+    $manifestMap = Get-ManifestMap -Path $manifest
+    $historicalHash = Test-ManifestHash -Map $manifestMap -FilePath $historicalSnapshot
+    Add-Check "historical snapshot hash protected" $historicalHash.Pass $historicalHash.Detail
+
+    $resonanceHash = Test-ManifestHash -Map $manifestMap -FilePath $resonanceArchive
+    Add-Check "pre-promotion copy hash protected" $resonanceHash.Pass $resonanceHash.Detail
 }
 
-if (Test-Path -LiteralPath $tasks) {
-    $check = Test-ContainsAll -Path $tasks -Needles @(
-        'Current prototype: `prototype.html` preserved baseline.',
-        'Current working build copy: `prototype_resonance.html`.',
-        'Decide whether to promote `prototype_resonance.html` over the preserved `prototype.html`.',
-        "Run the resonance build audit gate before promotion."
-    )
-    Add-Check "TASKS promotion gate" $check.Pass ("missing: " + ($check.Missing -join ", "))
-}
-
-if (Test-Path -LiteralPath $resonance) {
-    $html = Read-Utf8Text -Path $resonance
+if (Test-Path -LiteralPath $canonical -PathType Leaf) {
+    $html = Read-Utf8Text -Path $canonical
     $requiredHooks = @(
+        "Console14 role: canonical active static prototype",
         "reflection-panel",
         "data-scenario=`"email`"",
         "data-scenario=`"slack`"",
@@ -111,7 +128,11 @@ if (Test-Path -LiteralPath $resonance) {
         "window.console14"
     )
     $missingHooks = @($requiredHooks | Where-Object { $html -notlike "*$_*" })
-    Add-Check "resonance UI/function hooks" ($missingHooks.Count -eq 0) ("missing: " + ($missingHooks -join ", "))
+    Add-Check "canonical UI/function hooks" ($missingHooks.Count -eq 0) ("missing: " + ($missingHooks -join ", "))
+
+    $oldBackendMarkers = @("BERT", "consoleBert", "localhost:8000", "Server not running")
+    $foundOldMarkers = @($oldBackendMarkers | Where-Object { $html -like "*$_*" })
+    Add-Check "canonical old backend markers absent" ($foundOldMarkers.Count -eq 0) ("found: " + ($foundOldMarkers -join ", "))
 
     if (Get-Command node -ErrorAction SilentlyContinue) {
         $nodeScript = @'
@@ -211,10 +232,10 @@ if (payload.total !== 30000 || payload.issueCount !== 0 || payload.scenarioCount
   process.exit(1);
 }
 '@
-        $tmp = Join-Path ([System.IO.Path]::GetTempPath()) ("console14_resonance_audit_{0}.js" -f $PID)
+        $tmp = Join-Path ([System.IO.Path]::GetTempPath()) ("console14_promoted_static_audit_{0}.js" -f $PID)
         [System.IO.File]::WriteAllText($tmp, $nodeScript, [System.Text.UTF8Encoding]::new($false))
         try {
-            $nodeOutput = & node $tmp $resonance 2>&1
+            $nodeOutput = & node $tmp $canonical 2>&1
             $nodeExit = $LASTEXITCODE
         } finally {
             Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue
@@ -224,13 +245,64 @@ if (payload.total !== 30000 || payload.issueCount !== 0 || payload.scenarioCount
         try {
             $matrix = $json | ConvertFrom-Json
             $matrixPass = $nodeExit -eq 0 -and $matrix.total -eq 30000 -and $matrix.issueCount -eq 0 -and $matrix.scenarioCount -eq 5
-            Add-Check "sentence matrix audit" $matrixPass ("total=$($matrix.total); issues=$($matrix.issueCount); scenarios=$($matrix.scenarioCount)")
+            Add-Check "canonical sentence matrix audit" $matrixPass ("total=$($matrix.total); issues=$($matrix.issueCount); scenarios=$($matrix.scenarioCount)")
         } catch {
-            Add-Check "sentence matrix audit" $false ("could not parse node output: " + ($nodeOutput -join " "))
+            Add-Check "canonical sentence matrix audit" $false ("could not parse node output: " + ($nodeOutput -join " "))
         }
     } else {
-        Add-Check "sentence matrix audit" $false "node is required for the reusable JavaScript audit"
+        Add-Check "canonical sentence matrix audit" $false "node is required for the reusable JavaScript audit"
     }
+}
+
+if (Test-Path -LiteralPath $historicalSnapshot -PathType Leaf) {
+    $snapshotText = Read-Utf8Text -Path $historicalSnapshot
+    $oldMarkers = @("BERT", "consoleBert", "localhost:8000", "Server not running")
+    $missingOldMarkers = @($oldMarkers | Where-Object { $snapshotText -notlike "*$_*" })
+    Add-Check "historical snapshot preserves old backend traces" ($missingOldMarkers.Count -eq 0) ("missing: " + ($missingOldMarkers -join ", "))
+}
+
+if (Test-Path -LiteralPath $readme -PathType Leaf) {
+    $check = Test-ContainsAll -Path $readme -Needles @(
+        '`prototype.html`: canonical active static prototype',
+        'old BERT/local `consoleBert` traces',
+        "The script name is legacy; it now audits the promoted canonical static prototype"
+    )
+    Add-Check "README canonical role" $check.Pass ("missing: " + ($check.Missing -join ", "))
+}
+
+if (Test-Path -LiteralPath $spec -PathType Leaf) {
+    $check = Test-ContainsAll -Path $spec -Needles @(
+        'Promoted static route: `prototype.html`.',
+        'protected by `archive/prototype_manifest.sha256`.',
+        'Do not recreate `prototype_resonance.html` as an active root file',
+        "The six mobile files are UX-only layout candidates"
+    )
+    Add-Check "SPEC promoted governance" $check.Pass ("missing: " + ($check.Missing -join ", "))
+}
+
+if (Test-Path -LiteralPath $tasks -PathType Leaf) {
+    $check = Test-ContainsAll -Path $tasks -Needles @(
+        'Current prototype: `prototype.html` canonical active static prototype.',
+        "Promote the resonance build into the canonical static prototype.",
+        'target = canonical `prototype.html` plus archive snapshots.'
+    )
+    Add-Check "TASKS promoted route" $check.Pass ("missing: " + ($check.Missing -join ", "))
+}
+
+if (Test-Path -LiteralPath $rootReadme -PathType Leaf) {
+    $check = Test-ContainsAll -Path $rootReadme -Needles @(
+        "Console14 canonical static source: [10_projects/console14/prototype.html]",
+        'It reflects `main`/Pages only after the promotion PR is merged.'
+    )
+    Add-Check "root README public/source split" $check.Pass ("missing: " + ($check.Missing -join ", "))
+}
+
+if (Test-Path -LiteralPath $projectsReadme -PathType Leaf) {
+    $check = Test-ContainsAll -Path $projectsReadme -Needles @(
+        'Canonical static source is `console14/prototype.html`',
+        "The Netlify/Render path remains a backend experiment."
+    )
+    Add-Check "projects README public/source split" $check.Pass ("missing: " + ($check.Missing -join ", "))
 }
 
 $rows | Format-Table -AutoSize

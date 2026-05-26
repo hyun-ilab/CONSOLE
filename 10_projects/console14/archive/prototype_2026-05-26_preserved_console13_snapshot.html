@@ -1,11 +1,10 @@
 <!doctype html>
 <html lang="en">
-  <!-- Console14 role: backend experiment only; not the canonical static prototype. -->
+  <!-- Console14 role: archived historical preserved Console13/early Console14 snapshot; contains old BERT/local consoleBert traces by design; not active. -->
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="console14-backend-url" content="https://console14-backend.onrender.com" />
-    <title>Console Prototype 14 - Backend Experiment</title>
+    <title>Console Prototype 14 - Striped LCD Grid</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -668,8 +667,8 @@
 
         .plate-shell {
           min-height: 100vh;
-          width: 100%;
-          max-width: 100%;
+          width: 100vw;
+          max-width: 100vw;
           min-width: 0;
         }
 
@@ -842,15 +841,6 @@
         text-transform: uppercase;
       }
 
-      .custom-input-kicker,
-      .custom-status {
-        margin: 0 0 12px;
-        color: var(--muted);
-        font-family: "IBM Plex Mono", monospace;
-        font-size: 12px;
-        line-height: 1.35;
-      }
-
       .custom-input-field {
         width: 100%;
         min-height: 44px;
@@ -914,20 +904,6 @@
         min-height: 44px;
         white-space: pre-wrap;
         word-wrap: break-word;
-      }
-
-      .custom-status {
-        margin: 14px 0 0;
-        min-height: 18px;
-      }
-
-      .custom-status[data-state="error"] {
-        color: var(--accent);
-      }
-
-      .custom-status[data-state="working"],
-      .custom-status[data-state="warning"] {
-        color: var(--graphite);
       }
     </style>
   </head>
@@ -1023,21 +999,19 @@
         </section>
       </section>
 
-      <section class="custom-input-panel" aria-label="Claude backend transform experiment">
-        <label class="custom-input-label" for="customInput">Backend transform experiment</label>
-        <p class="custom-input-kicker">Claude backend experiment with echo fallback. ElevenLabs is the normal speech provider; browser speech is only a provider-unavailable fallback.</p>
+      <section class="custom-input-panel" aria-label="custom text transform">
+        <label class="custom-input-label">Enter your own text</label>
         <textarea
           class="custom-input-field"
           id="customInput"
-          placeholder="Type a message, then run the backend transform or ElevenLabs speech route."
-          aria-label="Custom text input for the backend transform experiment"
+          placeholder="Type your message here and click TRANSFORM or SPEAK to apply the current tone."
+          aria-label="Custom text input"
         ></textarea>
         <div class="custom-buttons">
-          <button class="custom-button" id="transformButton" type="button" aria-label="Run backend transform experiment with Claude">TRANSFORM</button>
-          <button class="custom-button" id="speakCustomButton" type="button" aria-label="Speak through ElevenLabs backend TTS, with browser speech only if the provider is unavailable">SPEAK</button>
+          <button class="custom-button" id="transformButton" type="button" aria-label="Transform text using BERT">TRANSFORM</button>
+          <button class="custom-button" id="speakCustomButton" type="button" aria-label="Speak the custom text">SPEAK</button>
         </div>
-        <div class="custom-status" id="customStatus" aria-live="polite" data-state="idle">Backend URL not configured.</div>
-        <div class="custom-output" id="customOutput" aria-live="polite" aria-label="Backend transform output"></div>
+        <div class="custom-output" id="customOutput" aria-live="polite" aria-label="Transformed output"></div>
       </section>
     </main>
 
@@ -1063,26 +1037,6 @@
       const transformButton = document.getElementById("transformButton");
       const speakCustomButton = document.getElementById("speakCustomButton");
       const customOutput = document.getElementById("customOutput");
-      const customStatus = document.getElementById("customStatus");
-      const queryBackendUrl = new URLSearchParams(window.location.search).get("backend");
-      const configuredBackendUrl =
-        queryBackendUrl ||
-        window.CONSOLE14_BACKEND_URL ||
-        document.querySelector('meta[name="console14-backend-url"]')?.content ||
-        "";
-      const backendBaseUrl = configuredBackendUrl.replace(/\/+$/, "");
-
-      function setCustomStatus(message, state = "idle") {
-        customStatus.textContent = message;
-        customStatus.dataset.state = state;
-      }
-
-      function backendUrl(path) {
-        if (!backendBaseUrl) {
-          throw new Error("Backend URL is not configured for this build.");
-        }
-        return `${backendBaseUrl}${path}`;
-      }
 
       function getToneName(index) {
         const families = ["dry", "plain", "warm", "firm", "bright", "low"];
@@ -1091,37 +1045,20 @@
 
       async function transformCustomText() {
         const text = customInput.value.trim();
-        if (!text) {
-          customOutput.textContent = "(empty input)";
-          setCustomStatus("Enter text before running the backend transform experiment.", "error");
-          return;
-        }
+        if (!text) { customOutput.textContent = "(empty input)"; return; }
         transformButton.disabled = true;
-        customOutput.textContent = "Transforming through backend experiment...";
-        setCustomStatus("Backend transform running through Claude route.", "working");
+        customOutput.textContent = "Transforming...";
         try {
-          const res = await fetch(backendUrl("/transform"), {
+          const res = await fetch("http://localhost:8000/transform", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ text, tone: getToneName(toneIndex), x: gridXIndex, y: gridYIndex })
           });
-          if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            customOutput.textContent = text;
-            setCustomStatus(`Backend transform error ${res.status}: ${err.detail || res.statusText}`, "error");
-            return;
-          }
+          if (!res.ok) { const err = await res.json().catch(() => ({})); customOutput.textContent = `Error: ${err.detail || res.statusText}`; return; }
           const result = await res.json();
           customOutput.textContent = result.text || text;
-          const source = result.source ? `source: ${result.source}` : "source: backend";
-          if (result.warning) {
-            setCustomStatus(`Backend transform fallback (${source}). ${result.warning}`, "warning");
-          } else {
-            setCustomStatus(`Backend transform complete (${source}).`, "idle");
-          }
         } catch (e) {
-          customOutput.textContent = text;
-          setCustomStatus(`Backend transform unavailable: ${e.message}`, "error");
+          customOutput.textContent = `Server not running — start consoleBert (port 8000)`;
         } finally {
           transformButton.disabled = false;
         }
@@ -1129,20 +1066,16 @@
 
       async function speakCustom() {
         const outputText = customOutput.textContent.trim();
-        const isOutputError = !outputText || outputText.startsWith("(") || outputText.startsWith("Transforming");
+        const isOutputError = !outputText || outputText.startsWith("(") || outputText.startsWith("Error") || outputText.startsWith("Server");
         const textToSpeak = isOutputError ? customInput.value.trim() : outputText;
-        if (!textToSpeak) {
-          setCustomStatus("Enter text before requesting ElevenLabs speech.", "error");
-          return;
-        }
+        if (!textToSpeak) return;
 
         speakCustomButton.disabled = true;
         setVoiceState("speaking");
-        customOutput.textContent = textToSpeak;
-        setCustomStatus("Requesting ElevenLabs audio from backend TTS.", "working");
+        customOutput.textContent = "Speaking...";
 
         try {
-          const res = await fetch(backendUrl("/tts"), {
+          const res = await fetch("http://localhost:8000/tts", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ text: textToSpeak, tone: getToneName(toneIndex) })
@@ -1150,108 +1083,52 @@
 
           if (res.ok) {
             const blob = await res.blob();
-            await playElevenLabsAudio(blob, textToSpeak);
+            const audioUrl = URL.createObjectURL(blob);
+            const audio = new Audio(audioUrl);
+            audio.onended = () => {
+              URL.revokeObjectURL(audioUrl);
+              setVoiceState("idle");
+              speakCustomButton.disabled = false;
+              customOutput.textContent = textToSpeak;
+            };
+            audio.onerror = (e) => {
+              URL.revokeObjectURL(audioUrl);
+              customOutput.textContent = `Audio playback error: ${e.message || "unknown"}`;
+              speakCustomButton.disabled = false;
+              setVoiceState("idle");
+            };
+            audio.play();
             return;
           }
 
           const err = await res.json().catch(() => ({}));
-          await speakWithProviderUnavailableFallback(
-            textToSpeak,
-            `ElevenLabs unavailable (${res.status}): ${err.detail || res.statusText}`
-          );
+          customOutput.textContent = `TTS error ${res.status}: ${err.detail || res.statusText}`;
+          speakCustomButton.disabled = false;
+          setVoiceState("idle");
         } catch (e) {
-          await speakWithProviderUnavailableFallback(textToSpeak, `ElevenLabs network/backend unavailable: ${e.message}`);
+          customOutput.textContent = `TTS network error: ${e.message}`;
+          speakCustomButton.disabled = false;
+          setVoiceState("idle");
         }
-      }
-
-      function playElevenLabsAudio(blob, text) {
-        return new Promise((resolve) => {
-          const audioUrl = URL.createObjectURL(blob);
-          const audio = new Audio(audioUrl);
-          let settled = false;
-          const finish = (state, message, statusState = "idle") => {
-            if (settled) return;
-            settled = true;
-            URL.revokeObjectURL(audioUrl);
-            setVoiceState(state);
-            speakCustomButton.disabled = false;
-            customOutput.textContent = text;
-            setCustomStatus(message, statusState);
-            resolve();
-          };
-          const fallback = () => {
-            if (settled) return;
-            settled = true;
-            URL.revokeObjectURL(audioUrl);
-            speakWithProviderUnavailableFallback(
-              text,
-              "ElevenLabs audio playback error; using browser provider-unavailable fallback."
-            ).then(resolve);
-          };
-          audio.onended = () => finish("idle", "ElevenLabs speech complete.");
-          audio.onerror = fallback;
-          const playPromise = audio.play();
-          if (playPromise) {
-            playPromise
-              .then(() => setCustomStatus("Playing ElevenLabs audio.", "working"))
-              .catch(fallback);
-          }
-        });
-      }
-
-      function speakWithProviderUnavailableFallback(text, reason) {
-        setCustomStatus(`${reason} Browser speech fallback is provider-unavailable only.`, "warning");
-        return speakWithWebSpeech(text);
       }
 
       function speakWithWebSpeech(text) {
         customOutput.textContent = text;
-        return new Promise((resolve) => {
-          if (!("speechSynthesis" in window)) {
-            setVoiceState("error");
-            speakCustomButton.disabled = false;
-            setCustomStatus("ElevenLabs unavailable, and browser speech fallback is unavailable.", "error");
-            resolve();
-            return;
-          }
-          const tone = toneFamily();
-          window.speechSynthesis.cancel();
-          const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = "en-US";
-          utterance.rate = tone.rate + (toneIndex % 10) * 0.006;
-          utterance.pitch = tone.pitch + (gridYIndex - (GRID_Y_STEPS - 1) / 2) * 0.04;
-          const fallbackTimeout = window.setTimeout(() => {
-            setVoiceState("idle");
-            speakCustomButton.disabled = false;
-            setCustomStatus("Provider-unavailable browser speech fallback timed out and recovered.", "idle");
-            resolve();
-          }, Math.max(5000, Math.min(12000, text.length * 90)));
-          utterance.onstart = () => setVoiceState("speaking");
-          utterance.onend = () => {
-            window.clearTimeout(fallbackTimeout);
-            setVoiceState("idle");
-            speakCustomButton.disabled = false;
-            setCustomStatus("Provider-unavailable browser speech fallback complete.", "idle");
-            resolve();
-          };
-          utterance.onerror = () => {
-            window.clearTimeout(fallbackTimeout);
-            setVoiceState("error");
-            speakCustomButton.disabled = false;
-            setCustomStatus("Provider-unavailable browser speech fallback failed.", "error");
-            resolve();
-          };
-          window.speechSynthesis.speak(utterance);
-        });
+        if (!("speechSynthesis" in window)) { setVoiceState("error"); speakCustomButton.disabled = false; return; }
+        const tone = toneFamily();
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "en-US";
+        utterance.rate = tone.rate + (toneIndex % 10) * 0.006;
+        utterance.pitch = tone.pitch + (gridYIndex - (GRID_Y_STEPS - 1) / 2) * 0.04;
+        utterance.onstart = () => setVoiceState("speaking");
+        utterance.onend = () => { setVoiceState("idle"); speakCustomButton.disabled = false; };
+        utterance.onerror = () => { setVoiceState("error"); speakCustomButton.disabled = false; };
+        window.speechSynthesis.speak(utterance);
       }
 
       transformButton.addEventListener("click", transformCustomText);
       speakCustomButton.addEventListener("click", speakCustom);
-      if (!backendBaseUrl) {
-        setCustomStatus("Backend URL not configured. Set window.CONSOLE14_BACKEND_URL, a console14-backend-url meta tag, or a ?backend=https://... query parameter before public use.", "error");
-      } else {
-        setCustomStatus(`Backend URL configured: ${backendBaseUrl}`, "idle");
-      }
 
       const formalityAxis = [
         {
