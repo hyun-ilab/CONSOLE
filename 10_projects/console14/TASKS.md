@@ -2,9 +2,11 @@
 
 ## Setup
 
-- Current prototype: `prototype.html` preserved baseline.
-- Current working build copy: `prototype_resonance.html`.
+- Current prototype: `prototype.html` canonical active static prototype.
+- Archived historical snapshot: `archive/prototype_2026-05-26_preserved_console13_snapshot.html`.
+- Archived pre-promotion resonance copy: `archive/prototype_resonance_2026-05-26_pre_promotion_copy.html`.
 - Source copied from Console13 on 2026-05-24: `../console13/prototype.html`
+- Historical Done entries may mention `prototype_resonance.html`; current implementation work should read those targets as promoted into canonical `prototype.html`.
 - Goal: keep visual design mostly unchanged; rewrite sentence behavior and clarify tone/X/Y axes.
 
 ## Done
@@ -31,6 +33,12 @@
   - TASK-NOTE: role = keep the free Render service under memory limits by using Claude first and echo fallback only.
   - TASK-NOTE: links = Render `console14-backend`, environment group `hyun.ben`, `prototype_backend_experiment.html`.
   - TASK-NOTE: not = changing Ben's Claude/Haiku route or editing the preserved static builds.
+- [x] Promote the resonance build into the canonical static prototype.
+  - TASK-NOTE: aliases = B option, promote resonance, canonical static prototype.
+  - TASK-NOTE: target = `prototype.html`.
+  - TASK-NOTE: role = make the promoted resonance route the single active static source of truth.
+  - TASK-NOTE: links = archived historical snapshot, archived pre-promotion resonance copy, `audit_resonance_build.ps1`.
+  - TASK-NOTE: not = main merge, backend experiment promotion, or separate mobile-route promotion.
 
 ## Next
 
@@ -122,13 +130,13 @@
   - TASK-NOTE: not = in-app instruction text that explains the whole prototype.
 - [ ] Refine the mobile one-handed path: rework mobile interaction for stable thumb control of the dial, grid, and readouts.
   - TASK-NOTE: aliases = mobile thumb path, one-handed controls, narrow-screen interaction.
-  - TASK-NOTE: target = mobile layout and touch behavior of dial, XY grid, and readouts in `prototype_resonance.html`.
+  - TASK-NOTE: target = selected mobile UX folded into canonical `prototype.html`.
   - TASK-NOTE: role = make the existing industrial console usable on a phone without changing the visual identity.
-  - TASK-NOTE: links = must preserve tone dial, X/Y drag, readout stability, and text fit.
-  - TASK-NOTE: not = desktop redesign; not replacing the dial/grid interaction model.
+  - TASK-NOTE: links = `mobile_prototypes.html`, six UX-only candidates, tone dial, X/Y drag, readout stability, and text fit.
+  - TASK-NOTE: not = desktop redesign; not a separate final mobile route; not replacing the dial/grid interaction model.
 - [x] Create a reusable sentence-matrix audit: build an automated audit for all base tone/X/Y states and preset-expanded states.
   - TASK-NOTE: aliases = sentence matrix audit, 60x10x10 audit, combination checker.
-  - TASK-NOTE: target = automated validation around the `prototype_resonance.html` sentence-generation matrix.
+  - TASK-NOTE: target = automated validation around the canonical `prototype.html` sentence-generation matrix.
   - TASK-NOTE: role = catch duplicate adjacent states, text overflow risk, malformed sentences, and tone/X/Y drift.
   - TASK-NOTE: links = validates reusable sentence sets, tone family map, context presets, and explanation labels.
   - TASK-NOTE: not = manual visual QA replacement; browser layout checks still matter.
@@ -145,12 +153,12 @@
   - TASK-NOTE: role = check whether users understand tone dial, X/Y axes, presets, comparison, and explanation labels.
   - TASK-NOTE: links = should test the prototype after tone map and key interaction additions are in place.
   - TASK-NOTE: not = formal IRB-style study or broad product survey.
-- [ ] Capture durable browser QA evidence before promotion.
-  - TASK-NOTE: aliases = durable browser evidence, non-temp screenshots, promotion QA record.
-  - TASK-NOTE: target = browser QA notes and any screenshots for `prototype_resonance.html`.
-  - TASK-NOTE: role = separate visual proof from temporary screenshots and one-off observations.
+- [ ] Capture durable browser QA evidence for the promoted canonical prototype.
+  - TASK-NOTE: aliases = durable browser evidence, non-temp screenshots, promoted static QA record.
+  - TASK-NOTE: target = browser QA notes and any screenshots for `prototype.html`.
+  - TASK-NOTE: role = separate visual proof from temporary screenshots and one-off observations after promotion.
   - TASK-NOTE: links = desktop QA, mobile 390/360 checks, detail zoom, local console logs, audit gate.
-  - TASK-NOTE: not = changing the prototype UI or overwriting the preserved baseline.
+  - TASK-NOTE: not = changing the prototype UI, reopening the old baseline, or claiming public/main update before merge.
 - [x] Define the tone safety boundary: define rules that separate clarity and firmness from manipulation, guilt pressure, fake intimacy, or excessive pressure.
   - TASK-NOTE: aliases = pressure safety, firm-not-manipulative rules, ethical tone boundaries.
   - TASK-NOTE: target = sentence-generation constraints and explanation/safety documentation.
@@ -163,10 +171,10 @@
   - TASK-NOTE: role = select the smallest next build sequence that improves user understanding fastest.
   - TASK-NOTE: links = should compare context presets, user-input mode, comparison mode, explanation layer, mobile path, and audit.
   - TASK-NOTE: not = adding every idea at once or changing the industrial visual design by default.
-- [ ] Decide whether to promote `prototype_resonance.html` over the preserved `prototype.html`.
-  - TASK-NOTE: aliases = promote resonance build, replace baseline, choose active prototype.
-  - TASK-NOTE: target = `prototype_resonance.html` and `prototype.html`.
-  - TASK-NOTE: role = preserve the original until the copied build is accepted.
-  - TASK-NOTE: links = resonance build browser QA, `audit_resonance_build.ps1`, original Console14 baseline.
-  - TASK-NOTE: not = automatic overwrite of the preserved baseline.
-  - TASK-NOTE: gate = Run the resonance build audit gate before promotion.
+- [x] Decide whether to promote `prototype_resonance.html` over the preserved `prototype.html`.
+  - TASK-NOTE: aliases = promote resonance build, replace baseline, choose active prototype, B option.
+  - TASK-NOTE: target = canonical `prototype.html` plus archive snapshots.
+  - TASK-NOTE: role = B option accepted; promoted resonance becomes the active static source and old baseline is archived.
+  - TASK-NOTE: links = `audit_resonance_build.ps1`, `archive/prototype_manifest.sha256`, original Console14 baseline snapshot.
+  - TASK-NOTE: not = main merge, backend experiment promotion, or deleting historical baseline.
+  - TASK-NOTE: gate = Run the promoted static prototype audit after promotion.

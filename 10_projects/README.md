@@ -12,7 +12,7 @@
 
 ## Active Project
 
-- [console14](console14/README.md): Prototype 14 active workbench. Current public route is the backend experiment on Netlify with a Render API; preserved static builds remain separate.
+- [console14](console14/README.md): Prototype 14 active workbench. Canonical static source is `console14/prototype.html`; public static routes update only after the promotion PR reaches the Pages/main source. The Netlify/Render path remains a backend experiment.
 
 ## Previous Source
 
