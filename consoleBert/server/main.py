@@ -112,7 +112,7 @@ def rewrite_with_claude(text: str, style: str) -> str:
 
     client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
     message = client.messages.create(
-        model="claude-haiku-4-5-20251001",
+        model="claude-3-5-haiku-20241022",
         max_tokens=256,
         system=(
             "You are a writing style transformer. You receive a piece of text and a target style. "
