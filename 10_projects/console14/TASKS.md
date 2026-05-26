@@ -151,6 +151,12 @@
   - TASK-NOTE: role = separate visual proof from temporary screenshots and one-off observations.
   - TASK-NOTE: links = desktop QA, mobile 390/360 checks, detail zoom, local console logs, audit gate.
   - TASK-NOTE: not = changing the prototype UI or overwriting the preserved baseline.
+- [ ] Create a yellow-tone improvement design plan.
+  - TASK-NOTE: aliases = yellow tone plan, yellow color pass, 디자인 계획, 노란색 톤 개선.
+  - TASK-NOTE: target = visual design notes and later CSS color changes in `prototype_resonance.html`.
+  - TASK-NOTE: role = improve the yellow tone so the console keeps its industrial identity while reducing glare, muddiness, or weak contrast.
+  - TASK-NOTE: links = should be checked with mobile layout, browser QA evidence, and promotion gate.
+  - TASK-NOTE: not = full visual redesign or changing the core dial/grid interaction model.
 - [x] Define the tone safety boundary: define rules that separate clarity and firmness from manipulation, guilt pressure, fake intimacy, or excessive pressure.
   - TASK-NOTE: aliases = pressure safety, firm-not-manipulative rules, ethical tone boundaries.
   - TASK-NOTE: target = sentence-generation constraints and explanation/safety documentation.
