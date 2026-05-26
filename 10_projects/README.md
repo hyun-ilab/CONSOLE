@@ -12,7 +12,7 @@
 
 ## Active Project
 
-- [console14](console14/README.md): Prototype 14 active workbench. Copied from Console13 on 2026-05-24; keep visual design mostly unchanged while rewriting sentence behavior and clarifying tone/X/Y axes.
+- [console14](console14/README.md): Prototype 14 active workbench. Current public route is the backend experiment on Netlify with a Render API; preserved static builds remain separate.
 
 ## Previous Source
 

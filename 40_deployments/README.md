@@ -12,4 +12,5 @@ Netlify 등 배포 대상, 배포 설정, 배포 로그, 사이트 사본을 두
 ## Current
 
 - [GitHub Pages public prototype](https://hyun-ilab.github.io/CONSOLE/)
-- [netlify_console_demo](netlify_console_demo/index.html)
+- [Netlify Console14 backend experiment](https://console-demo.netlify.app/10_projects/console14/prototype_backend_experiment.html)
+- [netlify_console_demo](netlify_console_demo/index.html) remains the older static demo copy used by the site root redirect.

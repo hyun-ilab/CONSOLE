@@ -1,72 +1,52 @@
-# consoleBert
+﻿# consoleBert
 
-A tone-aware text transformer and text-to-speech tool. Type any message, dial a tone (dry, plain, warm, firm, bright, low), and the system rewrites your text and speaks it in a matching voice.
+`consoleBert` is now the historical folder name for the Console14 backend experiment. The runnable server is not a BERT masked-word service: it tries a Claude rewrite and then returns the original text with a clear `source: "echo"` and `warning` if Claude is unavailable.
 
-## What you need
+The BERT notebooks in `colab/` are historical/notebook-only references unless a future task explicitly revives that route.
 
-- Python 3.10+
-- An **Anthropic API key** — get one at [console.anthropic.com](https://console.anthropic.com)
-- An **ElevenLabs API key** — get one at [elevenlabs.io](https://elevenlabs.io) (free tier works)
+## What You Need
 
-## Setup
+- Python 3.10+; Python 3.12 is the tested local target.
+- `ANTHROPIC_API_KEY` for Claude transforms.
+- `ELEVENLABS_API_KEY` for ElevenLabs TTS.
+- Keep key values out of git, logs, screenshots, and copied prompts.
 
-### 1. Install dependencies
+For deployed services, set keys in the platform environment-variable UI. Do not commit `.env` files. For local-only testing, `server/.env` is supported and ignored by git.
+
+## Local Setup
+
+From the repository root:
 
 ```powershell
-cd server
-python -m venv .venv
+cd consoleBert\server
+py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-```
-
-### 2. Add your API keys
-
-Copy the example env file and fill in your keys:
-
-```powershell
-copy server\.env.example server\.env
-```
-
-Open `server/.env` and replace the placeholders:
-
-```
-ELEVENLABS_API_KEY=your_elevenlabs_key_here
-ANTHROPIC_API_KEY=your_anthropic_key_here
-```
-
-### 3. Start the backend server
-
-```powershell
-cd server
-.\.venv\Scripts\Activate.ps1
 uvicorn main:app --reload --port 8000
 ```
 
-The server runs at `http://localhost:8000`. Visit `http://localhost:8000/docs` to test the API.
+Check `http://127.0.0.1:8000/` and `http://127.0.0.1:8000/docs`.
 
-### 4. Start the frontend
+## Frontend Experiment
 
-From the project root, run the static server:
+The backend experiment frontend is:
+
+```text
+10_projects/console14/prototype_backend_experiment.html
+```
+
+Public deployment: frontend `https://console-demo.netlify.app/10_projects/console14/prototype_backend_experiment.html`; backend `https://console14-backend.onrender.com`.
+
+Run the static server from the repository root:
 
 ```powershell
 .\tools\start_static_server.ps1
 ```
 
-Open the URL it prints, then navigate to:
+Open `http://127.0.0.1:<printed-port>/10_projects/console14/prototype_backend_experiment.html?backend=http://127.0.0.1:8000`.
 
-```
-/10_projects/console14/prototype.html
-```
+The preserved static build remains `10_projects/console14/prototype_resonance.html`.
 
-## How to use it
+## Voice Route
 
-1. Type a message in the **Enter your own text** box at the bottom of the page
-2. Dial the tone and adjust the X/Y grid
-3. Click **TRANSFORM** — Claude rewrites your message to match the selected tone and formality
-4. Click **SPEAK** — ElevenLabs reads it aloud in a voice that matches the tone
-
-## API keys on free tier
-
-**Anthropic** — pay-per-use, transform calls use Claude Haiku which is very cheap.
-
-**ElevenLabs** — free tier gives 10,000 characters/month. Only pre-made voices work on free tier. The app uses one voice per tone (Adam, Brian, Antoni, Daniel, Elli, Josh) which are all free-tier compatible. Do not swap these for other voices without checking they are pre-made voices, not Voice Library voices.
+ElevenLabs is the normal speech provider. The current server uses one Brian voice ID with tone-specific voice settings. Browser Web Speech is only a provider-unavailable fallback in the experiment UI, not the expected production path.
