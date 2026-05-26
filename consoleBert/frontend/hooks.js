@@ -1,9 +1,15 @@
-export async function transformText(text, tone, x, y, targetWord = null, targetMeaning = null) {
+function apiUrl(path, backendUrl = "") {
+  const base = backendUrl.replace(/\/+$/, "");
+  if (!base) throw new Error("Backend URL not configured");
+  return `${base}${path}`;
+}
+
+export async function transformText(text, tone, x, y, backendUrl = "") {
   try {
-    const res = await fetch("http://localhost:8000/transform", {
+    const res = await fetch(apiUrl("/transform", backendUrl), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, tone, x, y, target_word: targetWord, target_meaning: targetMeaning })
+      body: JSON.stringify({ text, tone, x, y })
     });
     if (!res.ok) return { text };
     return await res.json();
@@ -14,11 +20,11 @@ export async function transformText(text, tone, x, y, targetWord = null, targetM
 
 // tone: one of "dry" | "plain" | "warm" | "firm" | "bright" | "low"
 // voiceId: optional ElevenLabs voice ID override
-export async function requestTTS(text, tone = "plain", voiceId = null) {
+export async function requestTTS(text, tone = "plain", voiceId = null, backendUrl = "") {
   const body = { text, tone };
   if (voiceId) body.voice_id = voiceId;
 
-  const res = await fetch("http://localhost:8000/tts", {
+  const res = await fetch(apiUrl("/tts", backendUrl), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body)

@@ -37,6 +37,15 @@
         outline-offset: 2px;
       }
 
+      .custom-status {
+        margin-top: 14px;
+        min-height: 18px;
+        color: var(--muted);
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
       .custom-buttons {
         display: grid;
         grid-template-columns: 1fr 1fr;

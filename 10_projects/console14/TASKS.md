@@ -19,6 +19,18 @@
   - TASK-NOTE: role = verify preserved baseline, copied build hooks, governance docs, and sentence matrix before promotion.
   - TASK-NOTE: links = `prototype.html`, `prototype_resonance.html`, SPEC build governance, browser QA.
   - TASK-NOTE: not = a replacement for manual visual or audible QA.
+- [x] Split backend experiment build from the preserved static build.
+  - TASK-NOTE: aliases = backend experiment build, Ben backend split, Claude/echo route.
+  - TASK-NOTE: target = `prototype_backend_experiment.html` and `consoleBert/server/main.py`.
+  - TASK-NOTE: role = test backend transform and ElevenLabs TTS without changing the static mainline.
+  - TASK-NOTE: links = `prototype.html` preserved baseline, `prototype_resonance.html` static mainline, `consoleBert/INTEGRATION_GUIDE.md`.
+  - TASK-NOTE: not = promotion into `prototype_resonance.html` or direct edits to the preserved baseline.
+- [x] Remove FLAN/Torch from the Render backend path.
+  - TASK-NOTE: aliases = Render memory fix, Claude-only backend, FLAN removal.
+  - TASK-NOTE: target = `consoleBert/server/main.py` and `consoleBert/server/requirements.txt`.
+  - TASK-NOTE: role = keep the free Render service under memory limits by using Claude first and echo fallback only.
+  - TASK-NOTE: links = Render `console14-backend`, environment group `hyun.ben`, `prototype_backend_experiment.html`.
+  - TASK-NOTE: not = changing Ben's Claude/Haiku route or editing the preserved static builds.
 
 ## Next
 

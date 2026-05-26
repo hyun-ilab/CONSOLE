@@ -1,73 +1,66 @@
-# Integration Guide for Custom Text Transform UI
+﻿# Integration Guide for the Backend Experiment UI
 
-## Overview
-This guide explains how to integrate the custom text input and BERT-based semantic transform feature into `prototype.html`.
+## Boundary
 
-## Files to Integrate
+Do not edit `10_projects/console14/prototype.html` or `10_projects/console14/prototype_resonance.html` for this route.
 
-### 1. Styles (`custom-input-styles.css`)
-Add the CSS from `custom-input-styles.css` into the `<style>` block of `prototype.html`, right before the closing `</style>` tag (around line 823).
+The backend experiment lives in:
 
-### 2. HTML (`custom-input-html.txt`)
-Add the HTML from `custom-input-html.txt` into the `<main>` element, right before the closing `</main>` tag (currently around line 916).
-
-The section should be placed after `</section>` and before `</main>`.
-
-### 3. JavaScript (`custom-input-js.txt`)
-Add the JavaScript from `custom-input-js.txt` into the existing `<script>` block, after the line:
-```javascript
-const fieldCurrent = document.getElementById("fieldCurrent");
+```text
+10_projects/console14/prototype_backend_experiment.html
 ```
 
-This adds:
-- Element references for the custom input, buttons, and output
-- A helper function `getToneName(index)` to map the tone dial index to tone family names
-- `transformCustomText()` — fetches the BERT server and updates the output
-- `speakCustom()` — speaks the transformed text using Web Speech API with tone-based prosody
-- Event listeners for the TRANSFORM and SPEAK buttons
+The static mainline remains:
 
-## How It Works
+```text
+10_projects/console14/prototype_resonance.html
+```
 
-1. User types text into the textarea
-2. User clicks TRANSFORM
-3. The page sends a request to `POST http://localhost:8000/transform` with:
-   - `text`: the user's input
-   - `tone`: derived from current `toneIndex`
-   - `x` and `y`: current grid coordinates
-4. The BERT server uses the tone to select a semantic direction and performs masked-word replacement
-5. The result is displayed in `.custom-output`
-6. User can click SPEAK to hear the transformed text with tone-based prosody (rate/pitch)
+## Backend Contract
 
-## Prerequisites
+Run the FastAPI server from the repository root:
 
-Make sure the FastAPI server is running:
 ```powershell
-cd c:\Users\benja\OneDrive\Documents\Berkeley\summer2026\console\CONSOLE\consoleBert\server
+cd consoleBert\server
+.\.venv\Scripts\Activate.ps1
 uvicorn main:app --reload --port 8000
 ```
 
-The server will respond to `/transform` requests with semantically transformed text based on the supplied `tone`.
+Expected local endpoints:
 
-## Optional: CORS Setup
+- `GET /`
+- `GET /docs`
+- `POST /transform` with `{text, tone, x, y}`
+- `POST /tts` with `{text, tone}`
 
-If you encounter CORS errors (blocked fetch requests), the FastAPI server may need a CORS middleware. Add this to `consoleBert/server/main.py` if needed:
+`/transform` is a Claude backend experiment. If Claude is unavailable, the server returns the original text with `source: "echo"` and a `warning`. The Render deployment path intentionally omits FLAN-T5, Transformers, and Torch to stay within free-instance memory.
 
-```python
-from fastapi.middleware.cors import CORSMiddleware
+`/tts` is an ElevenLabs proxy. `ELEVENLABS_API_KEY` is required for the normal speech path.
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:*", "http://127.0.0.1:*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+## Frontend Backend URL
+
+The experiment page does not hard-code a deploy backend. Configure it by one of these routes:
+
+- `window.CONSOLE14_BACKEND_URL = "https://your-backend.example.com"` before the page script runs.
+- `<meta name="console14-backend-url" content="https://your-backend.example.com">`.
+- For local testing only, append `?backend=http://127.0.0.1:8000`.
+
+A public frontend deploy must point at a public backend URL, not a local port.
+
+## Key Handling
+
+Use platform environment variables for deployed services:
+
+```text
+ANTHROPIC_API_KEY
+ELEVENLABS_API_KEY
 ```
 
-## Testing
+Never commit key values, copy them into docs, or print them in verification logs.
 
-1. Open `http://localhost:8000/docs` in a browser to test the `/transform` endpoint manually
-2. Open `prototype.html` in a browser (via the static server: `tools/start_static_server.ps1`)
-3. Type a message in the custom text input box
-4. Click TRANSFORM — you should see a semantically transformed version
-5. Click SPEAK to hear it with tone-based prosody
+## Smoke Test
+
+1. Open `http://127.0.0.1:8000/docs`.
+2. Open the experiment page through `tools/start_static_server.ps1`.
+3. Type a message, click `TRANSFORM`, and confirm the status names the backend source or echo fallback.
+4. Click `SPEAK`; ElevenLabs is the normal path, and browser speech is only a provider-unavailable fallback.

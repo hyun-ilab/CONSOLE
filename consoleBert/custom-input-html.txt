@@ -1,14 +1,15 @@
-      <section class="custom-input-panel" aria-label="custom text transform">
-        <label class="custom-input-label">Enter your own text</label>
+﻿      <section class="custom-input-panel" aria-label="Claude backend transform experiment">
+        <label class="custom-input-label">Backend transform experiment</label>
         <textarea
           class="custom-input-field"
           id="customInput"
-          placeholder="Type your message here and click TRANSFORM or SPEAK to apply the current tone."
-          aria-label="Custom text input"
+          placeholder="Type a message, then run the backend transform or ElevenLabs speech route."
+          aria-label="Custom text input for the backend transform experiment"
         ></textarea>
         <div class="custom-buttons">
-          <button class="custom-button" id="transformButton" type="button" aria-label="Transform text using BERT">TRANSFORM</button>
-          <button class="custom-button" id="speakCustomButton" type="button" aria-label="Speak the custom text">SPEAK</button>
+          <button class="custom-button" id="transformButton" type="button" aria-label="Run backend transform experiment with Claude">TRANSFORM</button>
+          <button class="custom-button" id="speakCustomButton" type="button" aria-label="Speak through ElevenLabs backend TTS">SPEAK</button>
         </div>
-        <div class="custom-output" id="customOutput" aria-live="polite" aria-label="Transformed output"></div>
+        <div class="custom-status" id="customStatus" aria-live="polite"></div>
+        <div class="custom-output" id="customOutput" aria-live="polite" aria-label="Backend transform output"></div>
       </section>

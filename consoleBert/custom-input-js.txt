@@ -1,8 +1,24 @@
-      // Add these elements at the top of the script section
+﻿      // Add these elements at the top of the script section
       const customInput = document.getElementById("customInput");
       const transformButton = document.getElementById("transformButton");
       const speakCustomButton = document.getElementById("speakCustomButton");
       const customOutput = document.getElementById("customOutput");
+      const customStatus = document.getElementById("customStatus");
+      const backendBaseUrl = (
+        window.CONSOLE14_BACKEND_URL ||
+        document.querySelector('meta[name="console14-backend-url"]')?.content ||
+        new URLSearchParams(window.location.search).get("backend") ||
+        ""
+      ).replace(/\/+$/, "");
+
+      function backendUrl(path) {
+        if (!backendBaseUrl) throw new Error("Backend URL not configured");
+        return `${backendBaseUrl}${path}`;
+      }
+
+      function setCustomStatus(message) {
+        if (customStatus) customStatus.textContent = message;
+      }
 
       function getToneName(index) {
         const families = ["dry", "plain", "warm", "firm", "bright", "low"];
@@ -21,7 +37,7 @@
 
         try {
           const tone = getToneName(toneIndex);
-          const res = await fetch("http://localhost:8000/transform", {
+          const res = await fetch(backendUrl("/transform"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ text, tone, x: gridXIndex, y: gridYIndex })
@@ -29,20 +45,21 @@
 
           if (!res.ok) {
             const err = await res.json().catch(() => ({}));
-            customOutput.textContent = `Error: ${err.detail || res.statusText}`;
+            setCustomStatus(`Backend transform error ${res.status}: ${err.detail || res.statusText}`);
             return;
           }
 
           const result = await res.json();
           customOutput.textContent = result.text || text;
+          setCustomStatus(result.warning || `Backend transform complete (${result.source || "backend"}).`);
         } catch (e) {
-          customOutput.textContent = `Network error: ${e.message}`;
+          setCustomStatus(`Backend transform unavailable: ${e.message}`);
         } finally {
           transformButton.disabled = false;
         }
       }
 
-      // Try ElevenLabs TTS (tone-aware), fall back to Web Speech API.
+      // Try ElevenLabs TTS first. Browser speech is only a provider-unavailable fallback.
       async function speakCustom() {
         const textToSpeak = customOutput.textContent || customInput.value.trim();
         if (!textToSpeak || textToSpeak.startsWith("(") || textToSpeak.startsWith("Error")) return;
@@ -52,7 +69,7 @@
         setVoiceState("speaking");
 
         try {
-          const res = await fetch("http://localhost:8000/tts", {
+          const res = await fetch(backendUrl("/tts"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ text: textToSpeak, tone: toneName })
@@ -69,17 +86,15 @@
             };
             audio.onerror = () => {
               URL.revokeObjectURL(audioUrl);
+              setCustomStatus("ElevenLabs audio playback error; using browser provider-unavailable fallback.");
               speakWithWebSpeech(textToSpeak, toneName);
             };
             audio.play();
             return;
           }
-          // 501 = API key not set; fall through to Web Speech
-          if (res.status !== 501) {
-            console.warn("ElevenLabs TTS failed:", res.status);
-          }
+          setCustomStatus(`ElevenLabs unavailable (${res.status}); using browser provider-unavailable fallback.`);
         } catch (e) {
-          console.warn("ElevenLabs TTS unavailable, using Web Speech:", e.message);
+          setCustomStatus(`ElevenLabs network/backend unavailable: ${e.message}; using browser provider-unavailable fallback.`);
         }
 
         speakWithWebSpeech(textToSpeak, toneName);
@@ -97,12 +112,19 @@
         utterance.lang = "en-US";
         utterance.rate = tone.rate + (toneIndex % 10) * 0.006;
         utterance.pitch = tone.pitch + (gridYIndex - (GRID_Y_STEPS - 1) / 2) * 0.04;
+        const fallbackTimeout = window.setTimeout(() => {
+          setVoiceState("idle");
+          speakCustomButton.disabled = false;
+          setCustomStatus("Provider-unavailable browser speech fallback timed out and recovered.");
+        }, Math.max(5000, Math.min(12000, text.length * 90)));
         utterance.onstart = () => setVoiceState("speaking");
         utterance.onend = () => {
+          window.clearTimeout(fallbackTimeout);
           setVoiceState("idle");
           speakCustomButton.disabled = false;
         };
         utterance.onerror = () => {
+          window.clearTimeout(fallbackTimeout);
           setVoiceState("error");
           speakCustomButton.disabled = false;
         };
