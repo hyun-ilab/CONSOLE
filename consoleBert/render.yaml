@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: consolebert-api
+    runtime: python
+    rootDir: consoleBert/server
+    buildCommand: pip install -r requirements-prod.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false

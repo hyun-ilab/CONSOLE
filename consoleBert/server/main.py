@@ -10,7 +10,7 @@ load_dotenv(Path(__file__).resolve().parent / ".env")
 
 app = FastAPI(
     title="Console14 backend experiment API",
-    description="Claude backend transform experiment with echo fallback and ElevenLabs TTS proxy.",
+    description="Claude backend transform experiment with Emotion Geometry (valence/arousal) and ElevenLabs TTS proxy.",
 )
 
 app.add_middleware(
@@ -23,87 +23,110 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"status": "ok", "endpoints": ["POST /transform", "POST /tts", "GET /voices"], "docs": "/docs"}
+    return {"status": "ok", "endpoints": ["POST /transform", "POST /tts", "GET /emotions"], "docs": "/docs"}
 
 
-@app.get("/voices")
-async def list_voices():
-    api_key = (os.environ.get("ELEVENLABS_API_KEY") or "").strip()
-    if not api_key:
-        raise HTTPException(status_code=501, detail="ELEVENLABS_API_KEY not configured")
-    import requests as http
-
-    try:
-        r = http.get("https://api.elevenlabs.io/v1/voices", headers={"xi-api-key": api_key}, timeout=10)
-    except http.RequestException:
-        print("[voices] ElevenLabs request failed")
-        raise HTTPException(status_code=502, detail="ElevenLabs provider unavailable")
-    print(f"[voices] ElevenLabs status: {r.status_code}")
-    if not r.ok:
-        raise HTTPException(status_code=502, detail=f"ElevenLabs provider unavailable (status {r.status_code})")
-    voices = r.json().get("voices", [])
-    return [{"name": v["name"], "voice_id": v["voice_id"], "category": v.get("category")} for v in voices]
-
-
-# X axis: formality (0=CLOSE … 9=OFFICIAL)
-FORMALITY_LABELS = [
-    "very informal and close",
-    "casual and friendly",
-    "relaxed",
-    "neutral",
-    "clear and professional",
-    "courteous and respectful",
-    "polished",
-    "formal",
-    "distant and professional",
-    "official and institutional",
-]
-
-# Y axis: directness / urgency (0=OPEN … 9=NO LATER)
-DIRECTNESS_LABELS = [
-    "open-ended with no pressure",
-    "soft and gentle",
-    "easy and relaxed",
-    "clear with a mild deadline",
-    "direct with a firm deadline",
-    "pushing for urgency",
-    "pressing and insistent",
-    "urgent",
-    "strict",
-    "absolute deadline with no flexibility",
-]
-
-TONE_DESCRIPTIONS = {
-    "dry":    "brief and factual, no emotion",
-    "plain":  "straightforward and simple",
-    "warm":   "friendly, appreciative, and human",
-    "firm":   "decisive and commanding",
-    "bright": "upbeat and enthusiastic",
-    "low":    "calm and measured",
+# Emotion map: (valence, arousal) anchored to Anthropic 2026 emotion vectors
+# valence: -1.0 (very negative) … +1.0 (very positive)
+# arousal: -1.0 (very calm/low energy) … +1.0 (very activated/high energy)
+EMOTION_MAP = {
+    # high negative valence, high arousal
+    "panicked":    {"valence": -0.88, "arousal":  0.82},
+    "desperate":   {"valence": -0.85, "arousal":  0.75},
+    "furious":     {"valence": -0.80, "arousal":  0.88},
+    "terrified":   {"valence": -0.82, "arousal":  0.78},
+    # moderate negative valence, high arousal
+    "anxious":     {"valence": -0.55, "arousal":  0.65},
+    "angry":       {"valence": -0.60, "arousal":  0.72},
+    "frustrated":  {"valence": -0.48, "arousal":  0.52},
+    # negative valence, low arousal
+    "sad":         {"valence": -0.68, "arousal": -0.45},
+    "defeated":    {"valence": -0.72, "arousal": -0.55},
+    "resigned":    {"valence": -0.42, "arousal": -0.48},
+    "gloomy":      {"valence": -0.58, "arousal": -0.35},
+    # mild negative, near neutral arousal
+    "disappointed": {"valence": -0.38, "arousal": -0.10},
+    "worried":     {"valence": -0.32, "arousal":  0.38},
+    "uncertain":   {"valence": -0.15, "arousal":  0.12},
+    # neutral zone
+    "neutral":     {"valence":  0.00, "arousal":  0.00},
+    "dry":         {"valence":  0.00, "arousal": -0.52},
+    "plain":       {"valence":  0.05, "arousal": -0.20},
+    # positive valence, low arousal
+    "calm":        {"valence":  0.25, "arousal": -0.65},
+    "serene":      {"valence":  0.40, "arousal": -0.72},
+    "content":     {"valence":  0.45, "arousal": -0.30},
+    "reflective":  {"valence":  0.20, "arousal": -0.40},
+    # positive valence, moderate arousal
+    "warm":        {"valence":  0.58, "arousal":  0.22},
+    "hopeful":     {"valence":  0.52, "arousal":  0.35},
+    "confident":   {"valence":  0.55, "arousal":  0.45},
+    "firm":        {"valence":  0.30, "arousal":  0.50},
+    # high positive valence, high arousal
+    "excited":     {"valence":  0.78, "arousal":  0.72},
+    "elated":      {"valence":  0.85, "arousal":  0.78},
+    "joyful":      {"valence":  0.82, "arousal":  0.65},
+    "bright":      {"valence":  0.65, "arousal":  0.60},
+    "enthusiastic": {"valence": 0.72, "arousal":  0.68},
 }
 
 BRIAN = "nPczCjzI2devNBz1zQrb"
 
-TONE_TTS = {
-    "dry":    {"voice_id": BRIAN, "settings": {"stability": 0.92, "similarity_boost": 0.75, "style": 0.00, "use_speaker_boost": False}},
-    "plain":  {"voice_id": BRIAN, "settings": {"stability": 0.78, "similarity_boost": 0.75, "style": 0.10, "use_speaker_boost": True}},
-    "warm":   {"voice_id": BRIAN, "settings": {"stability": 0.38, "similarity_boost": 0.85, "style": 0.65, "use_speaker_boost": True}},
-    "firm":   {"voice_id": BRIAN, "settings": {"stability": 0.82, "similarity_boost": 0.80, "style": 0.30, "use_speaker_boost": True}},
-    "bright": {"voice_id": BRIAN, "settings": {"stability": 0.18, "similarity_boost": 0.75, "style": 0.92, "use_speaker_boost": True}},
-    "low":    {"voice_id": BRIAN, "settings": {"stability": 0.92, "similarity_boost": 0.75, "style": 0.05, "use_speaker_boost": False}},
-}
+
+def coords_to_style_description(valence: float, arousal: float) -> str:
+    if valence <= -0.7:
+        valence_desc = "deeply negative, distressed"
+    elif valence <= -0.4:
+        valence_desc = "negative, troubled"
+    elif valence <= -0.1:
+        valence_desc = "slightly negative, uneasy"
+    elif valence < 0.1:
+        valence_desc = "neutral, emotionally flat"
+    elif valence < 0.4:
+        valence_desc = "mildly positive, warm"
+    elif valence < 0.7:
+        valence_desc = "positive, upbeat"
+    else:
+        valence_desc = "highly positive, elated"
+
+    if arousal <= -0.6:
+        arousal_desc = "very calm and slow-paced"
+    elif arousal <= -0.2:
+        arousal_desc = "measured and unhurried"
+    elif arousal < 0.2:
+        arousal_desc = "moderate pace"
+    elif arousal < 0.5:
+        arousal_desc = "lively and engaged"
+    elif arousal < 0.75:
+        arousal_desc = "high energy and urgent"
+    else:
+        arousal_desc = "extremely intense and urgent"
+
+    return f"{valence_desc}, {arousal_desc}"
+
+
+def coords_to_voice_settings(valence: float, arousal: float) -> dict:
+    stability = max(0.10, min(0.95, 0.50 - arousal * 0.32))
+    emotional_intensity = abs(valence) * 0.65 + abs(arousal) * 0.35
+    negativity_boost = max(0, -valence) * 0.18
+    style = max(0.00, min(1.00, emotional_intensity * 0.75 + negativity_boost))
+    use_speaker_boost = arousal > -0.3
+    return {
+        "stability": round(stability, 3),
+        "similarity_boost": 0.75,
+        "style": round(style, 3),
+        "use_speaker_boost": use_speaker_boost,
+    }
 
 
 class TransformRequest(BaseModel):
     text: str = Field(..., description="Raw message to rewrite.")
-    tone: Optional[str] = Field(default=None, description="Tone family: dry, plain, warm, firm, bright, or low.")
-    x: Optional[int] = Field(default=None, ge=0, le=9, description="Formality/social-distance coordinate, 0-9.")
-    y: Optional[int] = Field(default=None, ge=0, le=9, description="Directness/pressure coordinate, 0-9.")
+    emotion: str = Field(..., description="Emotion label from the emotion map, e.g. 'warm', 'anxious', 'dry'.")
 
 
 class TTSRequest(BaseModel):
     text: str
-    tone: Optional[str] = None
+    emotion: str
     voice_id: Optional[str] = None
 
 
@@ -138,27 +161,39 @@ def rewrite_with_claude(text: str, style: str) -> str:
     return message.content[0].text.strip()
 
 
+@app.get("/emotions")
+async def list_emotions():
+    return [
+        {"emotion": name, "valence": coords["valence"], "arousal": coords["arousal"]}
+        for name, coords in EMOTION_MAP.items()
+    ]
+
+
 @app.post("/transform")
 async def transform(req: TransformRequest):
     if not req.text or not req.text.strip():
         return {"text": "", "original": "", "source": "echo", "warning": "Empty input."}
 
-    style_parts = []
-    if req.tone:
-        style_parts.append(TONE_DESCRIPTIONS.get(req.tone.lower(), req.tone))
-    if req.x is not None and 0 <= req.x < len(FORMALITY_LABELS):
-        style_parts.append(FORMALITY_LABELS[req.x])
-    if req.y is not None and 0 <= req.y < len(DIRECTNESS_LABELS):
-        style_parts.append(DIRECTNESS_LABELS[req.y])
-    style = ", ".join(style_parts) if style_parts else "natural"
+    emotion_key = req.emotion.lower()
+    coords = EMOTION_MAP.get(emotion_key)
+    if coords is None:
+        raise HTTPException(status_code=400, detail=f"Unknown emotion '{req.emotion}'. See GET /emotions.")
+
+    style = coords_to_style_description(coords["valence"], coords["arousal"])
     warning_parts = []
 
-    # Try Claude first if API key is available
     if (os.environ.get("ANTHROPIC_API_KEY") or "").strip():
         try:
             rewritten = rewrite_with_claude(req.text, style)
             if rewritten:
-                return {"text": rewritten, "original": req.text, "source": "claude"}
+                return {
+                    "text": rewritten,
+                    "original": req.text,
+                    "source": "claude",
+                    "emotion": emotion_key,
+                    "valence": coords["valence"],
+                    "arousal": coords["arousal"],
+                }
         except Exception as exc:
             status_code = getattr(exc, "status_code", None)
             status_part = f" status={status_code}" if status_code else ""
@@ -186,10 +221,13 @@ async def tts(req: TTSRequest):
 
     import requests as http
 
-    tone_key = (req.tone or "plain").lower()
-    tone_config = TONE_TTS.get(tone_key, TONE_TTS["plain"])
-    voice_id = req.voice_id or tone_config["voice_id"]
-    voice_settings = tone_config["settings"]
+    emotion_key = req.emotion.lower()
+    coords = EMOTION_MAP.get(emotion_key)
+    if coords is None:
+        raise HTTPException(status_code=400, detail=f"Unknown emotion '{req.emotion}'. See GET /emotions.")
+
+    voice_settings = coords_to_voice_settings(coords["valence"], coords["arousal"])
+    voice_id = req.voice_id or BRIAN
 
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
     headers = {"xi-api-key": api_key, "Content-Type": "application/json"}
@@ -206,7 +244,7 @@ async def tts(req: TTSRequest):
         raise HTTPException(status_code=502, detail="ElevenLabs provider unavailable")
 
     if r.status_code != 200:
-        print(f"[tts] ElevenLabs status: {r.status_code}")
+        print(f"[tts] ElevenLabs status: {r.status_code} body: {r.text[:200]}")
         raise HTTPException(status_code=502, detail=f"ElevenLabs provider unavailable (status {r.status_code})")
 
     return Response(content=r.content, media_type=r.headers.get("content-type", "audio/mpeg"))

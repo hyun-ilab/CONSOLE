@@ -904,28 +904,6 @@
         white-space: pre-wrap;
         word-wrap: break-word;
       }
-      .emotion-row {
-        display: flex;
-        gap: 12px;
-        align-items: flex-start;
-        margin-bottom: 12px;
-      }
-      .emotion-select {
-        flex: 1;
-        padding: 8px 10px;
-        border: 1px solid rgba(0, 0, 0, 0.36);
-        background: #fefdfb;
-        color: var(--ink);
-        font-family: "IBM Plex Mono", monospace;
-        font-size: 13px;
-        cursor: pointer;
-        text-transform: capitalize;
-      }
-      .va-canvas {
-        flex-shrink: 0;
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        background: rgba(239, 238, 231, 0.4);
-      }
     </style>
   </head>
   <body>
@@ -1021,19 +999,15 @@
       </section>
 
       <section class="custom-input-panel" aria-label="custom text transform">
-        <label class="custom-input-label">Emotion Geometry</label>
-        <div class="emotion-row">
-          <select class="emotion-select" id="emotionSelect" aria-label="Select emotion"></select>
-          <canvas class="va-canvas" id="vaCanvas" width="120" height="120" aria-label="Valence-arousal space"></canvas>
-        </div>
+        <label class="custom-input-label">Enter your own text</label>
         <textarea
           class="custom-input-field"
           id="customInput"
-          placeholder="Type your message and click TRANSFORM or SPEAK."
+          placeholder="Type your message here and click TRANSFORM or SPEAK to apply the current tone."
           aria-label="Custom text input"
         ></textarea>
         <div class="custom-buttons">
-          <button class="custom-button" id="transformButton" type="button" aria-label="Transform text">TRANSFORM</button>
+          <button class="custom-button" id="transformButton" type="button" aria-label="Transform text using BERT">TRANSFORM</button>
           <button class="custom-button" id="speakCustomButton" type="button" aria-label="Speak the custom text">SPEAK</button>
         </div>
         <div class="custom-output" id="customOutput" aria-live="polite" aria-label="Transformed output"></div>
@@ -1059,103 +1033,25 @@
       const topY = document.getElementById("topY");
       const fieldCurrent = document.getElementById("fieldCurrent");
       const customInput = document.getElementById("customInput");
-      const emotionSelect = document.getElementById("emotionSelect");
-      const vaCanvas = document.getElementById("vaCanvas");
       const transformButton = document.getElementById("transformButton");
       const speakCustomButton = document.getElementById("speakCustomButton");
       const customOutput = document.getElementById("customOutput");
 
-      const EMOTION_MAP = {
-        panicked:     { valence: -0.88, arousal:  0.82 },
-        desperate:    { valence: -0.85, arousal:  0.75 },
-        furious:      { valence: -0.80, arousal:  0.88 },
-        terrified:    { valence: -0.82, arousal:  0.78 },
-        anxious:      { valence: -0.55, arousal:  0.65 },
-        angry:        { valence: -0.60, arousal:  0.72 },
-        frustrated:   { valence: -0.48, arousal:  0.52 },
-        sad:          { valence: -0.68, arousal: -0.45 },
-        defeated:     { valence: -0.72, arousal: -0.55 },
-        resigned:     { valence: -0.42, arousal: -0.48 },
-        gloomy:       { valence: -0.58, arousal: -0.35 },
-        disappointed: { valence: -0.38, arousal: -0.10 },
-        worried:      { valence: -0.32, arousal:  0.38 },
-        uncertain:    { valence: -0.15, arousal:  0.12 },
-        neutral:      { valence:  0.00, arousal:  0.00 },
-        dry:          { valence:  0.00, arousal: -0.52 },
-        plain:        { valence:  0.05, arousal: -0.20 },
-        calm:         { valence:  0.25, arousal: -0.65 },
-        serene:       { valence:  0.40, arousal: -0.72 },
-        content:      { valence:  0.45, arousal: -0.30 },
-        reflective:   { valence:  0.20, arousal: -0.40 },
-        warm:         { valence:  0.58, arousal:  0.22 },
-        hopeful:      { valence:  0.52, arousal:  0.35 },
-        confident:    { valence:  0.55, arousal:  0.45 },
-        firm:         { valence:  0.30, arousal:  0.50 },
-        excited:      { valence:  0.78, arousal:  0.72 },
-        elated:       { valence:  0.85, arousal:  0.78 },
-        joyful:       { valence:  0.82, arousal:  0.65 },
-        bright:       { valence:  0.65, arousal:  0.60 },
-        enthusiastic: { valence:  0.72, arousal:  0.68 },
-      };
-
-      Object.keys(EMOTION_MAP).forEach(name => {
-        const opt = document.createElement("option");
-        opt.value = name;
-        opt.textContent = name;
-        emotionSelect.appendChild(opt);
-      });
-      emotionSelect.value = "neutral";
-
-      function drawVACanvas() {
-        const ctx = vaCanvas.getContext("2d");
-        const W = vaCanvas.width, H = vaCanvas.height;
-        const pad = 12;
-        const cx = W / 2, cy = H / 2;
-        ctx.clearRect(0, 0, W, H);
-        ctx.strokeStyle = "rgba(0,0,0,0.12)";
-        ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(cx, pad); ctx.lineTo(cx, H - pad); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(pad, cy); ctx.lineTo(W - pad, cy); ctx.stroke();
-        ctx.fillStyle = "rgba(0,0,0,0.30)";
-        ctx.font = "7px 'Courier New'";
-        ctx.textAlign = "center";
-        ctx.fillText("activated", cx, pad + 7);
-        ctx.fillText("calm", cx, H - pad + 1);
-        ctx.save(); ctx.translate(pad - 2, cy + 10); ctx.rotate(-Math.PI / 2); ctx.fillText("neg", 0, 0); ctx.restore();
-        ctx.save(); ctx.translate(W - pad + 2, cy - 4); ctx.rotate(Math.PI / 2); ctx.fillText("pos", 0, 0); ctx.restore();
-        const toX = v => pad + ((v + 1) / 2) * (W - 2 * pad);
-        const toY = a => pad + ((1 - a) / 2) * (H - 2 * pad);
-        const selected = emotionSelect.value;
-        Object.entries(EMOTION_MAP).forEach(([name, { valence, arousal }]) => {
-          const x = toX(valence), y = toY(arousal);
-          const isSel = name === selected;
-          ctx.beginPath();
-          ctx.arc(x, y, isSel ? 5 : 2.5, 0, 2 * Math.PI);
-          ctx.fillStyle = isSel ? "#c04b00" : "rgba(0,0,0,0.32)";
-          ctx.fill();
-          if (isSel) {
-            ctx.font = "bold 7px 'Courier New'";
-            ctx.fillStyle = "#c04b00";
-            ctx.textAlign = "center";
-            ctx.fillText(name, x, y - 7);
-          }
-        });
+      function getToneName(index) {
+        const families = ["dry", "plain", "warm", "firm", "bright", "low"];
+        return families[Math.floor(index / 10)];
       }
-
-      drawVACanvas();
-      emotionSelect.addEventListener("change", drawVACanvas);
 
       async function transformCustomText() {
         const text = customInput.value.trim();
         if (!text) { customOutput.textContent = "(empty input)"; return; }
-        const emotion = emotionSelect.value;
         transformButton.disabled = true;
         customOutput.textContent = "Transforming...";
         try {
-          const res = await fetch("http://localhost:8000/transform", {
+          const res = await fetch("https://console-1k2w.onrender.com/transform", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text, emotion })
+            body: JSON.stringify({ text, tone: getToneName(toneIndex), x: gridXIndex, y: gridYIndex })
           });
           if (!res.ok) { const err = await res.json().catch(() => ({})); customOutput.textContent = `Error: ${err.detail || res.statusText}`; return; }
           const result = await res.json();
@@ -1172,16 +1068,18 @@
         const isOutputError = !outputText || outputText.startsWith("(") || outputText.startsWith("Error") || outputText.startsWith("Server");
         const textToSpeak = isOutputError ? customInput.value.trim() : outputText;
         if (!textToSpeak) return;
-        const emotion = emotionSelect.value;
+
         speakCustomButton.disabled = true;
         setVoiceState("speaking");
         customOutput.textContent = "Speaking...";
+
         try {
-          const res = await fetch("http://localhost:8000/tts", {
+          const res = await fetch("https://console-1k2w.onrender.com/tts", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: textToSpeak, emotion })
+            body: JSON.stringify({ text: textToSpeak, tone: getToneName(toneIndex) })
           });
+
           if (res.ok) {
             const blob = await res.blob();
             const audioUrl = URL.createObjectURL(blob);
@@ -1201,6 +1099,7 @@
             audio.play();
             return;
           }
+
           const err = await res.json().catch(() => ({}));
           customOutput.textContent = `TTS error ${res.status}: ${err.detail || res.statusText}`;
           speakCustomButton.disabled = false;
@@ -1215,9 +1114,12 @@
       function speakWithWebSpeech(text) {
         customOutput.textContent = text;
         if (!("speechSynthesis" in window)) { setVoiceState("error"); speakCustomButton.disabled = false; return; }
+        const tone = toneFamily();
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = "en-US";
+        utterance.rate = tone.rate + (toneIndex % 10) * 0.006;
+        utterance.pitch = tone.pitch + (gridYIndex - (GRID_Y_STEPS - 1) / 2) * 0.04;
         utterance.onstart = () => setVoiceState("speaking");
         utterance.onend = () => { setVoiceState("idle"); speakCustomButton.disabled = false; };
         utterance.onerror = () => { setVoiceState("error"); speakCustomButton.disabled = false; };
