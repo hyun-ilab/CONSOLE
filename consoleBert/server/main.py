@@ -1,19 +1,17 @@
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import os
-import json
 from typing import Optional
 from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).resolve().parent / ".env")
 
-from transformers import T5ForConditionalGeneration, T5Tokenizer
-import torch
-import anthropic
-
-app = FastAPI(title="consoleBert API")
+app = FastAPI(
+    title="Console14 backend experiment API",
+    description="Claude backend transform experiment with echo fallback and ElevenLabs TTS proxy.",
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -33,31 +31,18 @@ async def list_voices():
     api_key = (os.environ.get("ELEVENLABS_API_KEY") or "").strip()
     if not api_key:
         raise HTTPException(status_code=501, detail="ELEVENLABS_API_KEY not configured")
-    print(f"[voices] key prefix: {api_key[:8]}... length={len(api_key)}")
     import requests as http
-    r = http.get("https://api.elevenlabs.io/v1/voices", headers={"xi-api-key": api_key}, timeout=5)
-    print(f"[voices] ElevenLabs status: {r.status_code} body: {r.text[:200]}")
+
+    try:
+        r = http.get("https://api.elevenlabs.io/v1/voices", headers={"xi-api-key": api_key}, timeout=10)
+    except http.RequestException:
+        print("[voices] ElevenLabs request failed")
+        raise HTTPException(status_code=502, detail="ElevenLabs provider unavailable")
+    print(f"[voices] ElevenLabs status: {r.status_code}")
     if not r.ok:
-        raise HTTPException(status_code=502, detail=f"ElevenLabs {r.status_code}: {r.text[:200]}")
+        raise HTTPException(status_code=502, detail=f"ElevenLabs provider unavailable (status {r.status_code})")
     voices = r.json().get("voices", [])
     return [{"name": v["name"], "voice_id": v["voice_id"], "category": v.get("category")} for v in voices]
-
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_FILE = BASE_DIR / "data" / "sample_sentences.json"
-SAMPLE = json.loads(DATA_FILE.read_text(encoding="utf-8")) if DATA_FILE.exists() else []
-
-# Lazy-loaded seq2seq model for full sentence rewriting
-REWRITE_MODEL = None
-REWRITE_TOKENIZER = None
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-def get_rewrite_model():
-    global REWRITE_MODEL, REWRITE_TOKENIZER
-    if REWRITE_MODEL is None:
-        REWRITE_TOKENIZER = T5Tokenizer.from_pretrained("google/flan-t5-base")
-        REWRITE_MODEL = T5ForConditionalGeneration.from_pretrained("google/flan-t5-base").to(DEVICE)
-    return REWRITE_MODEL, REWRITE_TOKENIZER
 
 
 # X axis: formality (0=CLOSE … 9=OFFICIAL)
@@ -109,33 +94,11 @@ TONE_TTS = {
 }
 
 
-def build_prompt(text: str, tone: Optional[str], x: Optional[int], y: Optional[int]) -> str:
-    parts = []
-    if tone:
-        parts.append(TONE_DESCRIPTIONS.get(tone.lower(), tone))
-    if x is not None and 0 <= x < len(FORMALITY_LABELS):
-        parts.append(FORMALITY_LABELS[x])
-    if y is not None and 0 <= y < len(DIRECTNESS_LABELS):
-        parts.append(DIRECTNESS_LABELS[y])
-
-    style = ", ".join(parts) if parts else "natural"
-
-    return (
-        f"Rewrite the following message so it sounds {style}. "
-        f"Keep the same core meaning but change the phrasing, word choice, and structure to match the style. "
-        f"Return only the rewritten message with no explanation.\n\n"
-        f"Message: {text}\n"
-        f"Rewritten:"
-    )
-
-
 class TransformRequest(BaseModel):
-    text: str
-    tone: Optional[str] = None
-    x: Optional[int] = None
-    y: Optional[int] = None
-    target_word: Optional[str] = None
-    target_meaning: Optional[str] = None
+    text: str = Field(..., description="Raw message to rewrite.")
+    tone: Optional[str] = Field(default=None, description="Tone family: dry, plain, warm, firm, bright, or low.")
+    x: Optional[int] = Field(default=None, ge=0, le=9, description="Formality/social-distance coordinate, 0-9.")
+    y: Optional[int] = Field(default=None, ge=0, le=9, description="Directness/pressure coordinate, 0-9.")
 
 
 class TTSRequest(BaseModel):
@@ -145,6 +108,8 @@ class TTSRequest(BaseModel):
 
 
 def rewrite_with_claude(text: str, style: str) -> str:
+    import anthropic
+
     client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
     message = client.messages.create(
         model="claude-haiku-4-5-20251001",
@@ -173,23 +138,10 @@ def rewrite_with_claude(text: str, style: str) -> str:
     return message.content[0].text.strip()
 
 
-def rewrite_with_flan(text: str, prompt: str) -> str:
-    model, tokenizer = get_rewrite_model()
-    inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=512).to(DEVICE)
-    outputs = model.generate(
-        **inputs,
-        max_new_tokens=150,
-        do_sample=True,
-        temperature=0.7,
-        repetition_penalty=1.2,
-    )
-    return tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
-
-
 @app.post("/transform")
 async def transform(req: TransformRequest):
     if not req.text or not req.text.strip():
-        return {"text": "", "source": "echo"}
+        return {"text": "", "original": "", "source": "echo", "warning": "Empty input."}
 
     style_parts = []
     if req.tone:
@@ -199,51 +151,28 @@ async def transform(req: TransformRequest):
     if req.y is not None and 0 <= req.y < len(DIRECTNESS_LABELS):
         style_parts.append(DIRECTNESS_LABELS[req.y])
     style = ", ".join(style_parts) if style_parts else "natural"
+    warning_parts = []
 
     # Try Claude first if API key is available
-    if os.environ.get("ANTHROPIC_API_KEY"):
+    if (os.environ.get("ANTHROPIC_API_KEY") or "").strip():
         try:
             rewritten = rewrite_with_claude(req.text, style)
             if rewritten:
-                return {"text": rewritten, "source": "claude"}
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Claude error: {e}")
+                return {"text": rewritten, "original": req.text, "source": "claude"}
+        except Exception:
+            warning_parts.append("Claude backend unavailable")
+    else:
+        warning_parts.append("ANTHROPIC_API_KEY not configured")
 
-    # Fallback: FLAN-T5
-    try:
-        prompt = build_prompt(req.text, req.tone, req.x, req.y)
-        rewritten = rewrite_with_flan(req.text, prompt)
-        if rewritten:
-            return {"text": rewritten, "source": "flan-t5"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Model error: {e}")
-
-    # Last resort: sample sentences
-    if req.tone:
-        for item in SAMPLE:
-            if item.get("tone") == req.tone and item.get("x") == req.x and item.get("y") == req.y:
-                return {"text": item["text"], "source": "sample"}
-        for item in SAMPLE:
-            if item.get("tone") == req.tone:
-                return {"text": item["text"], "source": "fallback-tone"}
-
-    return {"text": req.text, "source": "echo"}
-
-    # Fallback: return closest sample sentence for this tone
-    if req.tone:
-        for item in SAMPLE:
-            if item.get("tone") == req.tone and item.get("x") == req.x and item.get("y") == req.y:
-                return {"text": item["text"], "source": "sample"}
-        for item in SAMPLE:
-            if item.get("tone") == req.tone:
-                return {"text": item["text"], "source": "fallback-tone"}
-
-    return {"text": req.text, "source": "echo"}
+    warning = "Backend transform provider unavailable; returned original text."
+    if warning_parts:
+        warning = f"{warning} {'; '.join(warning_parts)}."
+    return {"text": req.text, "original": req.text, "source": "echo", "warning": warning}
 
 
 @app.post("/tts")
 async def tts(req: TTSRequest):
-    api_key = os.environ.get("ELEVENLABS_API_KEY")
+    api_key = (os.environ.get("ELEVENLABS_API_KEY") or "").strip()
     if not api_key:
         raise HTTPException(
             status_code=501,
@@ -267,14 +196,14 @@ async def tts(req: TTSRequest):
         "voice_settings": voice_settings,
     }
 
-    r = http.post(url, headers=headers, json=body)
+    try:
+        r = http.post(url, headers=headers, json=body, timeout=30)
+    except http.RequestException:
+        print("[tts] ElevenLabs request failed")
+        raise HTTPException(status_code=502, detail="ElevenLabs provider unavailable")
+
     if r.status_code != 200:
-        detail = f"ElevenLabs error {r.status_code}"
-        try:
-            detail += f": {r.text[:300]}"
-        except Exception:
-            pass
-        print(f"[TTS ERROR] voice={voice_id} model=eleven_multilingual_v2 → {detail}")
-        raise HTTPException(status_code=502, detail=detail)
+        print(f"[tts] ElevenLabs status: {r.status_code}")
+        raise HTTPException(status_code=502, detail=f"ElevenLabs provider unavailable (status {r.status_code})")
 
     return Response(content=r.content, media_type=r.headers.get("content-type", "audio/mpeg"))
